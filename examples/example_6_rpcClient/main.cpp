@@ -33,6 +33,6 @@ int main(int argc, char *argv[])
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
 
     rpcClient client;
-    client.connectToServer("qxmpp.test2@qxmpp.org", "qxmpp456");
+    client.connectToServer(QStringLiteral("qxmpp.test2@qxmpp.org"), QStringLiteral("qxmpp456"));
     return a.exec();
 }

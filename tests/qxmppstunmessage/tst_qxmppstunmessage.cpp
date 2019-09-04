@@ -64,7 +64,7 @@ void tst_QXmppStunMessage::testIPv4Address()
     // encode
     QXmppStunMessage msg;
     msg.setType(0x0001);
-    msg.mappedHost = QHostAddress("127.0.0.1");
+    msg.mappedHost = QHostAddress(QStringLiteral("127.0.0.1"));
     msg.mappedPort = 12345;
     QByteArray packet = msg.encode(QByteArray(), false);
     QCOMPARE(packet,
@@ -82,7 +82,7 @@ void tst_QXmppStunMessage::testIPv6Address()
     // encode
     QXmppStunMessage msg;
     msg.setType(0x0001);
-    msg.mappedHost = QHostAddress("::1");
+    msg.mappedHost = QHostAddress(QStringLiteral("::1"));
     msg.mappedPort = 12345;
     const QByteArray packet = msg.encode(QByteArray(), false);
     QCOMPARE(packet,
@@ -100,7 +100,7 @@ void tst_QXmppStunMessage::testXorIPv4Address()
     // encode
     QXmppStunMessage msg;
     msg.setType(0x0001);
-    msg.xorMappedHost = QHostAddress("127.0.0.1");
+    msg.xorMappedHost = QHostAddress(QStringLiteral("127.0.0.1"));
     msg.xorMappedPort = 12345;
     QByteArray packet = msg.encode(QByteArray(), false);
     QCOMPARE(packet,
@@ -118,7 +118,7 @@ void tst_QXmppStunMessage::testXorIPv6Address()
     // encode
     QXmppStunMessage msg;
     msg.setType(0x0001);
-    msg.xorMappedHost = QHostAddress("::1");
+    msg.xorMappedHost = QHostAddress(QStringLiteral("::1"));
     msg.xorMappedPort = 12345;
     const QByteArray packet = msg.encode(QByteArray(), false);
     QCOMPARE(packet,

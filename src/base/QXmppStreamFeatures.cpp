@@ -120,7 +120,7 @@ void QXmppStreamFeatures::setClientStateIndicationMode(QXmppStreamFeatures::Mode
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
     return element.namespaceURI() == ns_stream &&
-           element.tagName() == "features";
+           element.tagName() == QLatin1String("features");
 }
 
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const char *tagName, const char *tagNs)
@@ -130,7 +130,7 @@ static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, const c
     while (!subElement.isNull()) {
         if (subElement.namespaceURI() == tagNs)
         {
-            if (!subElement.firstChildElement("required").isNull())
+            if (!subElement.firstChildElement(QStringLiteral("required")).isNull())
                 mode = QXmppStreamFeatures::Required;
             else if (mode != QXmppStreamFeatures::Required)
                 mode = QXmppStreamFeatures::Enabled;
@@ -150,25 +150,25 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     m_csiMode = readFeature(element, "csi", ns_csi);
 
     // parse advertised compression methods
-    QDomElement compression = element.firstChildElement("compression");
+    QDomElement compression = element.firstChildElement(QStringLiteral("compression"));
     if (compression.namespaceURI() == ns_compressFeature)
     {
-        QDomElement subElement = compression.firstChildElement("method");
+        QDomElement subElement = compression.firstChildElement(QStringLiteral("method"));
         while(!subElement.isNull())
         {
             m_compressionMethods << subElement.text();
-            subElement = subElement.nextSiblingElement("method");
+            subElement = subElement.nextSiblingElement(QStringLiteral("method"));
         }
     }
 
     // parse advertised SASL Authentication mechanisms
-    QDomElement mechs = element.firstChildElement("mechanisms");
+    QDomElement mechs = element.firstChildElement(QStringLiteral("mechanisms"));
     if (mechs.namespaceURI() == ns_sasl)
     {
-        QDomElement subElement = mechs.firstChildElement("mechanism");
+        QDomElement subElement = mechs.firstChildElement(QStringLiteral("mechanism"));
         while(!subElement.isNull()) {
             m_authMechanisms << subElement.text();
-            subElement = subElement.nextSiblingElement("mechanism");
+            subElement = subElement.nextSiblingElement(QStringLiteral("mechanism"));
         }
     }
 }
@@ -178,16 +178,16 @@ static void writeFeature(QXmlStreamWriter *writer, const char *tagName, const ch
     if (mode != QXmppStreamFeatures::Disabled)
     {
         writer->writeStartElement(tagName);
-        writer->writeAttribute("xmlns", tagNs);
+        writer->writeAttribute(QStringLiteral("xmlns"), tagNs);
         if (mode == QXmppStreamFeatures::Required)
-            writer->writeEmptyElement("required");
+            writer->writeEmptyElement(QStringLiteral("required"));
         writer->writeEndElement();
     }
 }
 
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("stream:features");
+    writer->writeStartElement(QStringLiteral("stream:features"));
     writeFeature(writer, "bind", ns_bind, m_bindMode);
     writeFeature(writer, "session", ns_session, m_sessionMode);
     writeFeature(writer, "auth", ns_authFeature, m_nonSaslAuthMode);
@@ -197,18 +197,18 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 
     if (!m_compressionMethods.isEmpty())
     {
-        writer->writeStartElement("compression");
-        writer->writeAttribute("xmlns", ns_compressFeature);
+        writer->writeStartElement(QStringLiteral("compression"));
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_compressFeature);
         foreach (const QString &method, m_compressionMethods)
-            writer->writeTextElement("method", method);
+            writer->writeTextElement(QStringLiteral("method"), method);
         writer->writeEndElement();
     }
     if (!m_authMechanisms.isEmpty())
     {
-        writer->writeStartElement("mechanisms");
-        writer->writeAttribute("xmlns", ns_sasl);
+        writer->writeStartElement(QStringLiteral("mechanisms"));
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_sasl);
         foreach (const QString &mechanism, m_authMechanisms)
-            writer->writeTextElement("mechanism",  mechanism);
+            writer->writeTextElement(QStringLiteral("mechanism"),  mechanism);
         writer->writeEndElement();
     }
     writer->writeEndElement();

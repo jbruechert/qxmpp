@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     // For google talk
     // client.connectToServer("username@gmail.com", "passwd");
 
-    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    client.connectToServer(QStringLiteral("qxmpp.test1@qxmpp.org"), QStringLiteral("qxmpp123"));
 
     return app.exec();
 }

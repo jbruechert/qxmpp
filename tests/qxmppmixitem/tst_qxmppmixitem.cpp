@@ -72,11 +72,11 @@ void tst_QXmppMixItem::testInfo()
     serializePacket(element, xml);
 
     // test setters
-    item.setName("Skynet Development");
+    item.setName(QStringLiteral("Skynet Development"));
     QCOMPARE(item.name(), QString("Skynet Development"));
-    item.setDescription("Very cool development group.");
+    item.setDescription(QStringLiteral("Very cool development group."));
     QCOMPARE(item.description(), QString("Very cool development group."));
-    item.setContactJids(QStringList() << "somebody@example.org");
+    item.setContactJids(QStringList() << QStringLiteral("somebody@example.org"));
     QCOMPARE(item.contactJids(), QStringList() << "somebody@example.org");
 }
 
@@ -127,9 +127,9 @@ void tst_QXmppMixItem::testParticipant()
     serializePacket(element, xml);
 
     // test setters
-    item.setNick("thomasd");
+    item.setNick(QStringLiteral("thomasd"));
     QCOMPARE(item.nick(), QString("thomasd"));
-    item.setJid("thomas@d.example");
+    item.setJid(QStringLiteral("thomas@d.example"));
     QCOMPARE(item.jid(), QString("thomas@d.example"));
 }
 

@@ -34,18 +34,18 @@ xmppClient::xmppClient(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    check = connect(this, SIGNAL(connected()),
-                    SLOT(clientConnected()));
+    check = connect(this, &QXmppClient::connected,
+                    this, &xmppClient::clientConnected);
     Q_ASSERT(check);
 
-    check = connect(&this->rosterManager(), SIGNAL(rosterReceived()),
-                    SLOT(rosterReceived()));
+    check = connect(&this->rosterManager(), &QXmppRosterManager::rosterReceived,
+                    this, &xmppClient::rosterReceived);
     Q_ASSERT(check);
 
     /// Then QXmppRoster::presenceChanged() is emitted whenever presence of someone
     /// in roster changes
-    check = connect(&this->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
-                    SLOT(presenceChanged(QString,QString)));
+    check = connect(&this->rosterManager(), &QXmppRosterManager::presenceChanged,
+                    this, &xmppClient::presenceChanged);
     Q_ASSERT(check);
 }
 
@@ -65,7 +65,7 @@ void xmppClient::rosterReceived()
     foreach (const QString &bareJid, rosterManager().getRosterBareJids()) {
         QString name = rosterManager().getRosterEntry(bareJid).name();
         if(name.isEmpty())
-            name = "-";
+            name = QStringLiteral("-");
         qDebug("example_2_rosterHandling:: Roster received: %s [%s]", qPrintable(bareJid), qPrintable(name));
     }
 }
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     xmppClient client;
-    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    client.connectToServer(QStringLiteral("qxmpp.test1@qxmpp.org"), QStringLiteral("qxmpp123"));
 
     return app.exec();
 }

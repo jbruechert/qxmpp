@@ -521,7 +521,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
     if (buffer.size() < STUN_HEADER)
     {
-        *errors << QLatin1String("Received a truncated STUN packet");
+        *errors << QStringLiteral("Received a truncated STUN packet");
         return false;
     }
 
@@ -535,7 +535,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
     if (length != buffer.size() - STUN_HEADER)
     {
-        *errors << QLatin1String("Received an invalid STUN packet");
+        *errors << QStringLiteral("Received an invalid STUN packet");
         return false;
     }
 
@@ -552,7 +552,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
         // only FINGERPRINT is allowed after MESSAGE-INTEGRITY
         if (after_integrity && a_type != Fingerprint)
         {
-            *errors << QString("Skipping attribute %1 after MESSAGE-INTEGRITY").arg(QString::number(a_type));
+            *errors << QStringLiteral("Skipping attribute %1 after MESSAGE-INTEGRITY").arg(QString::number(a_type));
             stream.skipRawData(a_length + pad_length);
             done += 4 + a_length + pad_length;
             continue;
@@ -666,7 +666,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // MAPPED-ADDRESS
             if (!decodeAddress(stream, a_length, mappedHost, mappedPort))
             {
-                *errors << QLatin1String("Bad MAPPED-ADDRESS");
+                *errors << QStringLiteral("Bad MAPPED-ADDRESS");
                 return false;
             }
 
@@ -683,7 +683,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // SOURCE-ADDRESS
             if (!decodeAddress(stream, a_length, sourceHost, sourcePort))
             {
-                *errors << QLatin1String("Bad SOURCE-ADDRESS");
+                *errors << QStringLiteral("Bad SOURCE-ADDRESS");
                 return false;
             }
 
@@ -692,7 +692,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // CHANGED-ADDRESS
             if (!decodeAddress(stream, a_length, changedHost, changedPort))
             {
-                *errors << QLatin1String("Bad CHANGED-ADDRESS");
+                *errors << QStringLiteral("Bad CHANGED-ADDRESS");
                 return false;
             }
 
@@ -701,7 +701,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // OTHER-ADDRESS
             if (!decodeAddress(stream, a_length, otherHost, otherPort))
             {
-                *errors << QLatin1String("Bad OTHER-ADDRESS");
+                *errors << QStringLiteral("Bad OTHER-ADDRESS");
                 return false;
             }
 
@@ -710,7 +710,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // XOR-MAPPED-ADDRESS
             if (!decodeAddress(stream, a_length, xorMappedHost, xorMappedPort, m_id))
             {
-                *errors << QLatin1String("Bad XOR-MAPPED-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-MAPPED-ADDRESS");
                 return false;
             }
 
@@ -719,7 +719,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // XOR-PEER-ADDRESS
             if (!decodeAddress(stream, a_length, xorPeerHost, xorPeerPort, m_id))
             {
-                *errors << QLatin1String("Bad XOR-PEER-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-PEER-ADDRESS");
                 return false;
             }
 
@@ -728,7 +728,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             // XOR-RELAYED-ADDRESS
             if (!decodeAddress(stream, a_length, xorRelayedHost, xorRelayedPort, m_id))
             {
-                *errors << QLatin1String("Bad XOR-RELAYED-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-RELAYED-ADDRESS");
                 return false;
             }
 
@@ -747,7 +747,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
                 setBodyLength(copy, done + 24);
                 if (integrity != QXmppUtils::generateHmacSha1(key, copy))
                 {
-                    *errors << QLatin1String("Bad message integrity");
+                    *errors << QStringLiteral("Bad message integrity");
                     return false;
                 }
             }
@@ -769,7 +769,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             const quint32 expected = QXmppUtils::generateCrc32(copy) ^ 0x5354554eL;
             if (fingerprint != expected)
             {
-                *errors << QLatin1String("Bad fingerprint");
+                *errors << QStringLiteral("Bad fingerprint");
                 return false;
             }
 
@@ -796,7 +796,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // Unknown attribute
             stream.skipRawData(a_length);
-            *errors << QString("Skipping unknown attribute %1").arg(QString::number(a_type));
+            *errors << QStringLiteral("Skipping unknown attribute %1").arg(QString::number(a_type));
 
         }
         stream.skipRawData(pad_length);
@@ -1019,85 +1019,85 @@ QString QXmppStunMessage::toString() const
     QString typeName;
     switch (messageMethod())
     {
-        case Binding: typeName = "Binding"; break;
-        case SharedSecret: typeName = "Shared Secret"; break;
-        case Allocate: typeName = "Allocate"; break;
-        case Refresh: typeName = "Refresh"; break;
-        case Send: typeName = "Send"; break;
-        case Data: typeName = "Data"; break;
-        case CreatePermission: typeName = "CreatePermission"; break;
-        case ChannelBind: typeName = "ChannelBind"; break;
-        default: typeName = "Unknown"; break;
+        case Binding: typeName = QStringLiteral("Binding"); break;
+        case SharedSecret: typeName = QStringLiteral("Shared Secret"); break;
+        case Allocate: typeName = QStringLiteral("Allocate"); break;
+        case Refresh: typeName = QStringLiteral("Refresh"); break;
+        case Send: typeName = QStringLiteral("Send"); break;
+        case Data: typeName = QStringLiteral("Data"); break;
+        case CreatePermission: typeName = QStringLiteral("CreatePermission"); break;
+        case ChannelBind: typeName = QLatin1String("ChannelBind"); break;
+        default: typeName = QStringLiteral("Unknown"); break;
     }
     switch (messageClass())
     {
-        case Request: typeName += " Request"; break;
-        case Indication: typeName += " Indication"; break;
-        case Response: typeName += " Response"; break;
-        case Error: typeName += " Error"; break;
+        case Request: typeName += QLatin1String(" Request"); break;
+        case Indication: typeName += QLatin1String(" Indication"); break;
+        case Response: typeName += QLatin1String(" Response"); break;
+        case Error: typeName += QLatin1String(" Error"); break;
         default: break;
     }
-    dumpLines << QString(" type %1 (%2)")
+    dumpLines << QStringLiteral(" type %1 (%2)")
         .arg(typeName)
         .arg(QString::number(m_type));
-    dumpLines << QString(" id %1").arg(QString::fromLatin1(m_id.toHex()));
+    dumpLines << QStringLiteral(" id %1").arg(QString::fromLatin1(m_id.toHex()));
 
     // attributes
     if (m_attributes.contains(ChannelNumber))
-        dumpLines << QString(" * CHANNEL-NUMBER %1").arg(QString::number(m_channelNumber));
+        dumpLines << QStringLiteral(" * CHANNEL-NUMBER %1").arg(QString::number(m_channelNumber));
     if (errorCode)
-        dumpLines << QString(" * ERROR-CODE %1 %2")
+        dumpLines << QStringLiteral(" * ERROR-CODE %1 %2")
             .arg(QString::number(errorCode), errorPhrase);
     if (m_attributes.contains(Lifetime))
-        dumpLines << QString(" * LIFETIME %1").arg(QString::number(m_lifetime));
+        dumpLines << QStringLiteral(" * LIFETIME %1").arg(QString::number(m_lifetime));
     if (m_attributes.contains(Nonce))
-        dumpLines << QString(" * NONCE %1").arg(QString::fromLatin1(m_nonce));
+        dumpLines << QStringLiteral(" * NONCE %1").arg(QString::fromLatin1(m_nonce));
     if (m_attributes.contains(Realm))
-        dumpLines << QString(" * REALM %1").arg(m_realm);
+        dumpLines << QStringLiteral(" * REALM %1").arg(m_realm);
     if (m_attributes.contains(RequestedTransport))
-        dumpLines << QString(" * REQUESTED-TRANSPORT 0x%1").arg(QString::number(m_requestedTransport, 16));
+        dumpLines << QStringLiteral(" * REQUESTED-TRANSPORT 0x%1").arg(QString::number(m_requestedTransport, 16));
     if (m_attributes.contains(ReservationToken))
-        dumpLines << QString(" * RESERVATION-TOKEN %1").arg(QString::fromLatin1(m_reservationToken.toHex()));
+        dumpLines << QStringLiteral(" * RESERVATION-TOKEN %1").arg(QString::fromLatin1(m_reservationToken.toHex()));
     if (m_attributes.contains(Software))
-        dumpLines << QString(" * SOFTWARE %1").arg(m_software);
+        dumpLines << QStringLiteral(" * SOFTWARE %1").arg(m_software);
     if (m_attributes.contains(Username))
-        dumpLines << QString(" * USERNAME %1").arg(m_username);
+        dumpLines << QStringLiteral(" * USERNAME %1").arg(m_username);
     if (mappedPort)
-        dumpLines << QString(" * MAPPED-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * MAPPED-ADDRESS %1 %2")
             .arg(mappedHost.toString(), QString::number(mappedPort));
     if (m_attributes.contains(ChangeRequest))
-        dumpLines << QString(" * CHANGE-REQUEST %1")
+        dumpLines << QStringLiteral(" * CHANGE-REQUEST %1")
             .arg(QString::number(m_changeRequest));
     if (sourcePort)
-        dumpLines << QString(" * SOURCE-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * SOURCE-ADDRESS %1 %2")
             .arg(sourceHost.toString(), QString::number(sourcePort));
     if (changedPort)
-        dumpLines << QString(" * CHANGED-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * CHANGED-ADDRESS %1 %2")
             .arg(changedHost.toString(), QString::number(changedPort));
     if (otherPort)
-        dumpLines << QString(" * OTHER-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * OTHER-ADDRESS %1 %2")
             .arg(otherHost.toString(), QString::number(otherPort));
     if (xorMappedPort)
-        dumpLines << QString(" * XOR-MAPPED-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * XOR-MAPPED-ADDRESS %1 %2")
             .arg(xorMappedHost.toString(), QString::number(xorMappedPort));
     if (xorPeerPort)
-        dumpLines << QString(" * XOR-PEER-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * XOR-PEER-ADDRESS %1 %2")
             .arg(xorPeerHost.toString(), QString::number(xorPeerPort));
     if (xorRelayedPort)
-        dumpLines << QString(" * XOR-RELAYED-ADDRESS %1 %2")
+        dumpLines << QStringLiteral(" * XOR-RELAYED-ADDRESS %1 %2")
             .arg(xorRelayedHost.toString(), QString::number(xorRelayedPort));
     if (m_attributes.contains(Priority))
-        dumpLines << QString(" * PRIORITY %1").arg(QString::number(m_priority));
+        dumpLines << QStringLiteral(" * PRIORITY %1").arg(QString::number(m_priority));
     if (!iceControlling.isEmpty())
-        dumpLines << QString(" * ICE-CONTROLLING %1")
+        dumpLines << QStringLiteral(" * ICE-CONTROLLING %1")
             .arg(QString::fromLatin1(iceControlling.toHex()));
     if (!iceControlled.isEmpty())
-        dumpLines << QString(" * ICE-CONTROLLED %1")
+        dumpLines << QStringLiteral(" * ICE-CONTROLLED %1")
             .arg(QString::fromLatin1(iceControlled.toHex()));
     if (useCandidate)
-        dumpLines << QString(" * USE-CANDIDATE");
+        dumpLines << QStringLiteral(" * USE-CANDIDATE");
 
-    return dumpLines.join("\n");
+    return dumpLines.join(QStringLiteral("\n"));
 }
 
 /// Constructs a new QXmppStunTransaction.
@@ -1124,8 +1124,8 @@ QXmppStunTransaction::QXmppStunTransaction(const QXmppStunMessage &request, QObj
     // RTO timer
     m_retryTimer = new QTimer(this);
     m_retryTimer->setSingleShot(true);
-    check = connect(m_retryTimer, SIGNAL(timeout()),
-                    this, SLOT(retry()));
+    check = connect(m_retryTimer, &QTimer::timeout,
+                    this, &QXmppStunTransaction::retry);
 
     // send packet immediately
     m_retryTimer->start(0);
@@ -1159,7 +1159,7 @@ void QXmppStunTransaction::retry()
 {
     if (m_tries >= STUN_RTO_MAX) {
         m_response.setType(QXmppStunMessage::Error);
-        m_response.errorPhrase = QLatin1String("Request timed out");
+        m_response.errorPhrase = QStringLiteral("Request timed out");
         emit finished();
         return;
     }
@@ -1186,21 +1186,21 @@ QXmppTurnAllocation::QXmppTurnAllocation(QObject *parent)
     Q_UNUSED(check);
 
     socket = new QUdpSocket(this);
-    check = connect(socket, SIGNAL(readyRead()),
-                    this, SLOT(readyRead()));
+    check = connect(socket, &QIODevice::readyRead,
+                    this, &QXmppTurnAllocation::readyRead);
     Q_ASSERT(check);
 
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
-    check = connect(m_timer, SIGNAL(timeout()),
-                    this, SLOT(refresh()));
+    check = connect(m_timer, &QTimer::timeout,
+                    this, &QXmppTurnAllocation::refresh);
     Q_ASSERT(check);
 
     // channels are valid 600s, we refresh every 500s
     m_channelTimer = new QTimer(this);
     m_channelTimer->setInterval(500 * 1000);
-    check = connect(m_channelTimer, SIGNAL(timeout()),
-                    this, SLOT(refreshChannels()));
+    check = connect(m_channelTimer, &QTimer::timeout,
+                    this, &QXmppTurnAllocation::refreshChannels);
     Q_ASSERT(check);
 }
 
@@ -1222,7 +1222,7 @@ void QXmppTurnAllocation::connectToHost()
     // start listening for UDP
     if (socket->state() == QAbstractSocket::UnconnectedState) {
         if (!socket->bind()) {
-            warning("Could not start listening for TURN");
+            warning(QStringLiteral("Could not start listening for TURN"));
             return;
         }
     }
@@ -1276,7 +1276,7 @@ QXmppJingleCandidate QXmppTurnAllocation::localCandidate(int component) const
     candidate.setHost(relayedHost());
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(relayedPort());
-    candidate.setProtocol("udp");
+    candidate.setProtocol(QStringLiteral("udp"));
     candidate.setType(QXmppJingleCandidate::RelayedType);
     candidate.setPriority(candidatePriority(candidate));
     candidate.setFoundation(computeFoundation(
@@ -1324,7 +1324,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
     }
 
 #ifdef QXMPP_DEBUG_STUN
-    logReceived(QString("TURN packet from %1 port %2\n%3").arg(
+    logReceived(QStringLiteral("TURN packet from %1 port %2\n%3").arg(
             remoteHost.toString(),
             QString::number(remotePort),
             message.toString()));
@@ -1471,7 +1471,7 @@ void QXmppTurnAllocation::transactionFinished()
     if (method == QXmppStunMessage::Allocate) {
 
         if (reply.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("Allocation failed: %1 %2").arg(
+            warning(QStringLiteral("Allocation failed: %1 %2").arg(
                 QString::number(reply.errorCode), reply.errorPhrase));
             setState(UnconnectedState);
             return;
@@ -1479,7 +1479,7 @@ void QXmppTurnAllocation::transactionFinished()
         if (reply.xorRelayedHost.isNull() ||
             reply.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
             !reply.xorRelayedPort) {
-            warning("Allocation did not yield a valid relayed address");
+            warning(QStringLiteral("Allocation did not yield a valid relayed address"));
             setState(UnconnectedState);
             return;
         }
@@ -1497,7 +1497,7 @@ void QXmppTurnAllocation::transactionFinished()
     } else if (method == QXmppStunMessage::ChannelBind) {
 
         if (reply.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("ChannelBind failed: %1 %2").arg(
+            warning(QStringLiteral("ChannelBind failed: %1 %2").arg(
                 QString::number(reply.errorCode), reply.errorPhrase));
 
             // remove channel
@@ -1510,7 +1510,7 @@ void QXmppTurnAllocation::transactionFinished()
     } else if (method == QXmppStunMessage::Refresh) {
 
         if (reply.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("Refresh failed: %1 %2").arg(
+            warning(QStringLiteral("Refresh failed: %1 %2").arg(
                 QString::number(reply.errorCode), reply.errorPhrase));
             setState(UnconnectedState);
             return;
@@ -1574,7 +1574,7 @@ void QXmppTurnAllocation::writeStun(const QXmppStunMessage &message)
 {
     socket->writeDatagram(message.encode(m_key), m_turnHost, m_turnPort);
 #ifdef QXMPP_DEBUG_STUN
-    logSent(QString("TURN packet to %1 port %2\n%3").arg(
+    logSent(QStringLiteral("TURN packet to %1 port %2\n%3").arg(
             m_turnHost.toString(),
             QString::number(m_turnPort),
             message.toString()));
@@ -1588,7 +1588,7 @@ QXmppUdpTransport::QXmppUdpTransport(QUdpSocket *socket, QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    check = connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    check = connect(m_socket, &QIODevice::readyRead, this, &QXmppUdpTransport::readyRead);
     Q_ASSERT(check);
 }
 
@@ -1614,7 +1614,7 @@ QXmppJingleCandidate QXmppUdpTransport::localCandidate(int component) const
     candidate.setHost(addr);
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(m_socket->localPort());
-    candidate.setProtocol("udp");
+    candidate.setProtocol(QStringLiteral("udp"));
     candidate.setType(QXmppJingleCandidate::HostType);
     candidate.setPriority(candidatePriority(candidate));
     candidate.setFoundation(computeFoundation(
@@ -1709,19 +1709,19 @@ CandidatePair::State CandidatePair::state() const
 void CandidatePair::setState(CandidatePair::State state)
 {
     m_state = state;
-    info(QString("ICE pair changed to state %1 %2").arg(QLatin1String(pair_states[state]), toString()));
+    info(QStringLiteral("ICE pair changed to state %1 %2").arg(QLatin1String(pair_states[state]), toString()));
 }
 
 QString CandidatePair::toString() const
 {
     const QXmppJingleCandidate candidate = transport->localCandidate(m_component);
-    QString str = QString("%1 port %2").arg(remote.host().toString(), QString::number(remote.port()));
+    QString str = QStringLiteral("%1 port %2").arg(remote.host().toString(), QString::number(remote.port()));
     if (candidate.type() == QXmppJingleCandidate::HostType)
-        str += QString(" (local %1 port %2)").arg(candidate.host().toString(), QString::number(candidate.port()));
+        str += QStringLiteral(" (local %1 port %2)").arg(candidate.host().toString(), QString::number(candidate.port()));
     else
-        str += QString(" (relayed)");
+        str += QStringLiteral(" (relayed)");
     if (!reflexive.host().isNull() && reflexive.port())
-        str += QString(" (reflexive %1 port %2)").arg(reflexive.host().toString(), QString::number(reflexive.port()));
+        str += QStringLiteral(" (reflexive %1 port %2)").arg(reflexive.host().toString(), QString::number(reflexive.port()));
     return str;
 }
 
@@ -1809,7 +1809,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         (candidate.type() != QXmppJingleCandidate::HostType &&
          candidate.type() != QXmppJingleCandidate::RelayedType &&
          candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
-        candidate.protocol() != "udp" ||
+        candidate.protocol() != QLatin1String("udp") ||
         (candidate.host().protocol() != QAbstractSocket::IPv4Protocol &&
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
         return false;
@@ -1854,7 +1854,7 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
     message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
     message.setPriority(peerReflexivePriority);
-    message.setUsername(QString("%1:%2").arg(config->remoteUser, config->localUser));
+    message.setUsername(QStringLiteral("%1:%2").arg(config->remoteUser, config->localUser));
     if (config->iceControlling) {
         message.iceControlling = config->tieBreaker;
         message.useCandidate = true;
@@ -1886,8 +1886,8 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
         socket->setParent(q);
 
         QXmppUdpTransport *transport = new QXmppUdpTransport(socket, q);
-        check = QObject::connect(transport, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
-                                 q, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+        check = QObject::connect(transport, &QXmppIceTransport::datagramReceived,
+                                 q, &QXmppIceComponent::handleDatagram);
         Q_ASSERT(check);
 
         QXmppJingleCandidate candidate = transport->localCandidate(component);
@@ -1944,7 +1944,7 @@ void QXmppIceComponentPrivate::writeStun(const QXmppStunMessage &message, QXmppI
     const QByteArray data = message.encode(messagePassword.toUtf8());
     transport->writeDatagram(data, address, port);
 #ifdef QXMPP_DEBUG_STUN
-    q->logSent(QString("STUN packet to %1 port %2\n%3").arg(
+    q->logSent(QStringLiteral("STUN packet to %1 port %2\n%3").arg(
                address.toString(),
                QString::number(port),
                message.toString()));
@@ -1965,19 +1965,19 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
 
     d->timer = new QTimer(this);
     d->timer->setInterval(500);
-    check = connect(d->timer, SIGNAL(timeout()),
-                    this, SLOT(checkCandidates()));
+    check = connect(d->timer, &QTimer::timeout,
+                    this, &QXmppIceComponent::checkCandidates);
     Q_ASSERT(check);
 
     d->turnAllocation = new QXmppTurnAllocation(this);
-    check = connect(d->turnAllocation, SIGNAL(connected()),
-                    this, SLOT(turnConnected()));
+    check = connect(d->turnAllocation, &QXmppTurnAllocation::connected,
+                    this, &QXmppIceComponent::turnConnected);
     Q_ASSERT(check);
-    check = connect(d->turnAllocation, SIGNAL(datagramReceived(QByteArray,QHostAddress,quint16)),
-                    this, SLOT(handleDatagram(QByteArray,QHostAddress,quint16)));
+    check = connect(d->turnAllocation, &QXmppIceTransport::datagramReceived,
+                    this, &QXmppIceComponent::handleDatagram);
     Q_ASSERT(check);
-    check = connect(d->turnAllocation, SIGNAL(disconnected()),
-                    this, SLOT(updateGatheringState()));
+    check = connect(d->turnAllocation, &QXmppTurnAllocation::disconnected,
+                    this, &QXmppIceComponent::updateGatheringState);
     Q_ASSERT(check);
 
     // calculate peer-reflexive candidate priority
@@ -1987,7 +1987,7 @@ QXmppIceComponent::QXmppIceComponent(int component, QXmppIcePrivate *config, QOb
     reflexive.setType(QXmppJingleCandidate::PeerReflexiveType);
     d->peerReflexivePriority = candidatePriority(reflexive);
 
-    setObjectName(QString("STUN(%1)").arg(QString::number(d->component)));
+    setObjectName(QStringLiteral("STUN(%1)").arg(QString::number(d->component)));
 }
 
 /// Destroys the QXmppIceComponent.
@@ -2011,7 +2011,7 @@ void QXmppIceComponent::checkCandidates()
 {
     if (d->config->remoteUser.isEmpty())
         return;
-    debug("Checking remote candidates");
+    debug(QStringLiteral("Checking remote candidates"));
 
     foreach (CandidatePair *pair, d->pairs) {
         if (pair->state() == CandidatePair::WaitingState) {
@@ -2108,7 +2108,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         return;
     }
 #ifdef QXMPP_DEBUG_STUN
-    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+    logReceived(QStringLiteral("STUN packet from %1 port %2\n%3").arg(
             remoteHost.toString(),
             QString::number(remotePort),
             message.toString()));
@@ -2130,10 +2130,10 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     {
         // check for role conflict
         if (d->config->iceControlling && (!message.iceControlling.isEmpty() || message.useCandidate)) {
-            warning("Role conflict, expected to be controlling");
+            warning(QStringLiteral("Role conflict, expected to be controlling"));
             return;
         } else if (!d->config->iceControlling && !message.iceControlled.isEmpty()) {
-            warning("Role conflict, expected to be controlled");
+            warning(QStringLiteral("Role conflict, expected to be controlled"));
             return;
         }
 
@@ -2162,7 +2162,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             remoteCandidate.setId(QXmppUtils::generateStanzaHash(10));
             remoteCandidate.setPort(remotePort);
             remoteCandidate.setPriority(message.priority());
-            remoteCandidate.setProtocol("udp");
+            remoteCandidate.setProtocol(QStringLiteral("udp"));
             remoteCandidate.setType(QXmppJingleCandidate::PeerReflexiveType);
             remoteCandidate.setFoundation(QXmppUtils::generateStanzaHash(32));
 
@@ -2222,7 +2222,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         if (remoteHost != pair->remote.host() || remotePort != pair->remote.port()) {
             QXmppStunMessage error;
             error.setType(QXmppStunMessage::Error);
-            error.errorPhrase = QString("Received response from unexpected %1:%1").arg(
+            error.errorPhrase = QStringLiteral("Received response from unexpected %1:%1").arg(
                 remoteHost.toString(),
                 QString::number(remotePort));
             pair->transaction->readStun(error);
@@ -2236,7 +2236,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (pair && pair->nominated) {
         d->timer->stop();
         if (!d->activePair || pair->priority() > d->activePair->priority()) {
-            info(QString("ICE pair selected %1 (priority: %2)").arg(
+            info(QStringLiteral("ICE pair selected %1 (priority: %2)").arg(
                 pair->toString(), QString::number(pair->priority())));
             const bool wasConnected = (d->activePair != nullptr);
             d->activePair = pair;
@@ -2268,7 +2268,7 @@ void QXmppIceComponent::transactionFinished()
                 pair->nominated = true;
             }
         } else {
-            debug(QString("ICE forward check failed %1 (error %2)").arg(
+            debug(QStringLiteral("ICE forward check failed %1 (error %2)").arg(
                 pair->toString(),
                 transaction->response().errorPhrase));
             pair->setState(CandidatePair::FailedState);
@@ -2292,7 +2292,7 @@ void QXmppIceComponent::transactionFinished()
                 reflexiveHost = response.mappedHost;
                 reflexivePort = response.mappedPort;
             } else {
-                warning("STUN server did not provide a reflexive address");
+                warning(QStringLiteral("STUN server did not provide a reflexive address"));
                 return;
             }
 
@@ -2305,13 +2305,13 @@ void QXmppIceComponent::transactionFinished()
             }
 
             // add the new local candidate
-            debug(QString("Adding server-reflexive candidate %1 port %2").arg(reflexiveHost.toString(), QString::number(reflexivePort)));
+            debug(QStringLiteral("Adding server-reflexive candidate %1 port %2").arg(reflexiveHost.toString(), QString::number(reflexivePort)));
             QXmppJingleCandidate candidate;
             candidate.setComponent(d->component);
             candidate.setHost(reflexiveHost);
             candidate.setId(QXmppUtils::generateStanzaHash(10));
             candidate.setPort(reflexivePort);
-            candidate.setProtocol("udp");
+            candidate.setProtocol(QStringLiteral("udp"));
             candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
             candidate.setPriority(candidatePriority(candidate));
             candidate.setFoundation(computeFoundation(
@@ -2323,7 +2323,7 @@ void QXmppIceComponent::transactionFinished()
 
             emit localCandidatesChanged();
         } else {
-            debug(QString("STUN test failed (error %1)").arg(
+            debug(QStringLiteral("STUN test failed (error %1)").arg(
                 transaction->response().errorPhrase));
         }
         d->stunTransactions.remove(transaction);
@@ -2337,7 +2337,7 @@ void QXmppIceComponent::turnConnected()
     const QXmppJingleCandidate candidate = d->turnAllocation->localCandidate(d->component);
 
     // add the new local candidate
-    debug(QString("Adding relayed candidate %1 port %2").arg(
+    debug(QStringLiteral("Adding relayed candidate %1 port %2").arg(
         candidate.host().toString(),
         QString::number(candidate.port())));
     d->localCandidates << candidate;
@@ -2492,7 +2492,7 @@ void QXmppIceComponent::writeStun(const QXmppStunMessage &message)
     if (transport) {
         transport->writeDatagram(message.encode(), d->config->stunHost, d->config->stunPort);
 #ifdef QXMPP_DEBUG_STUN
-        logSent(QString("STUN packet to %1 port %2\n%3").arg(
+        logSent(QStringLiteral("STUN packet to %1 port %2\n%3").arg(
                    d->config->stunHost.toString(),
                    QString::number(d->config->stunPort),
                    message.toString()));
@@ -2538,8 +2538,8 @@ QXmppIceConnection::QXmppIceConnection(QObject *parent)
     d->connectTimer = new QTimer(this);
     d->connectTimer->setInterval(30000);
     d->connectTimer->setSingleShot(true);
-    check = connect(d->connectTimer, SIGNAL(timeout()),
-                    this, SLOT(slotTimeout()));
+    check = connect(d->connectTimer, &QTimer::timeout,
+                    this, &QXmppIceConnection::slotTimeout);
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
@@ -2569,7 +2569,7 @@ void QXmppIceConnection::addComponent(int component)
     Q_UNUSED(check);
 
     if (d->components.contains(component)) {
-        warning(QString("Already have component %1").arg(QString::number(component)));
+        warning(QStringLiteral("Already have component %1").arg(QString::number(component)));
         return;
     }
 
@@ -2578,16 +2578,16 @@ void QXmppIceConnection::addComponent(int component)
     socket->d->setTurnUser(d->turnUser);
     socket->d->setTurnPassword(d->turnPassword);
 
-    check = connect(socket, SIGNAL(localCandidatesChanged()),
-                    this, SIGNAL(localCandidatesChanged()));
+    check = connect(socket, &QXmppIceComponent::localCandidatesChanged,
+                    this, &QXmppIceConnection::localCandidatesChanged);
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(connected()),
-                    this, SLOT(slotConnected()));
+    check = connect(socket, &QXmppIceComponent::connected,
+                    this, &QXmppIceConnection::slotConnected);
     Q_ASSERT(check);
 
-    check = connect(socket, SIGNAL(gatheringStateChanged()),
-                    this, SLOT(slotGatheringStateChanged()));
+    check = connect(socket, &QXmppIceComponent::gatheringStateChanged,
+                    this, &QXmppIceConnection::slotGatheringStateChanged);
     Q_ASSERT(check);
 
     d->components[component] = socket;
@@ -2601,7 +2601,7 @@ void QXmppIceConnection::addRemoteCandidate(const QXmppJingleCandidate &candidat
 {
     QXmppIceComponent *socket = d->components.value(candidate.component());
     if (!socket) {
-        warning(QString("Not adding candidate for unknown component %1").arg(
+        warning(QStringLiteral("Not adding candidate for unknown component %1").arg(
                 QString::number(candidate.component())));
         return;
     }
@@ -2784,7 +2784,7 @@ void QXmppIceConnection::slotConnected()
     foreach (QXmppIceComponent *socket, d->components.values())
         if (!socket->isConnected())
             return;
-    info(QString("ICE negotiation completed"));
+    info(QStringLiteral("ICE negotiation completed"));
     d->connectTimer->stop();
     emit connected();
 }
@@ -2808,7 +2808,7 @@ void QXmppIceConnection::slotGatheringStateChanged()
         newGatheringState = BusyGatheringState;
 
     if (newGatheringState != d->gatheringState) {
-        info(QString("ICE gathering state changed from '%1' to '%2'").arg(
+        info(QStringLiteral("ICE gathering state changed from '%1' to '%2'").arg(
             gathering_states[d->gatheringState],
             gathering_states[newGatheringState]));
         d->gatheringState = newGatheringState;
@@ -2818,7 +2818,7 @@ void QXmppIceConnection::slotGatheringStateChanged()
 
 void QXmppIceConnection::slotTimeout()
 {
-    warning(QString("ICE negotiation timed out"));
+    warning(QStringLiteral("ICE negotiation timed out"));
     foreach (QXmppIceComponent *socket, d->components.values())
         socket->close();
     emit disconnected();

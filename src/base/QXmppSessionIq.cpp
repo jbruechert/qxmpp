@@ -32,14 +32,14 @@
 /// \cond
 bool QXmppSessionIq::isSessionIq(const QDomElement &element)
 {
-    QDomElement sessionElement = element.firstChildElement("session");
+    QDomElement sessionElement = element.firstChildElement(QStringLiteral("session"));
     return (sessionElement.namespaceURI() == ns_session);
 }
 
 void QXmppSessionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("session");;
-    writer->writeAttribute("xmlns", ns_session);
+    writer->writeStartElement(QStringLiteral("session"));;
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_session);
     writer->writeEndElement();
 }
 /// \endcond

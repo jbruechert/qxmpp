@@ -86,7 +86,7 @@ void tst_QXmppTransferManager::testSendFile()
     QFETCH(QXmppTransferJob::Method, receiverMethods);
     QFETCH(bool, works);
 
-    const QString testDomain("localhost");
+    const QString testDomain(QStringLiteral("localhost"));
     const QHostAddress testHost(QHostAddress::LocalHost);
     const quint16 testPort = 12345;
 
@@ -95,8 +95,8 @@ void tst_QXmppTransferManager::testSendFile()
 
     // prepare server
     TestPasswordChecker passwordChecker;
-    passwordChecker.addCredentials("sender", "testpwd");
-    passwordChecker.addCredentials("receiver", "testpwd");
+    passwordChecker.addCredentials(QStringLiteral("sender"), QStringLiteral("testpwd"));
+    passwordChecker.addCredentials(QStringLiteral("receiver"), QStringLiteral("testpwd"));
 
     QXmppServer server;
     server.setDomain(testDomain);
@@ -112,15 +112,15 @@ void tst_QXmppTransferManager::testSendFile()
     sender.setLogger(&logger);
 
     QEventLoop senderLoop;
-    connect(&sender, SIGNAL(connected()), &senderLoop, SLOT(quit()));
-    connect(&sender, SIGNAL(disconnected()), &senderLoop, SLOT(quit()));
+    connect(&sender, &QXmppClient::connected, &senderLoop, &QEventLoop::quit);
+    connect(&sender, &QXmppClient::disconnected, &senderLoop, &QEventLoop::quit);
 
     QXmppConfiguration config;
     config.setDomain(testDomain);
     config.setHost(testHost.toString());
     config.setPort(testPort);
-    config.setUser("sender");
-    config.setPassword("testpwd");
+    config.setUser(QStringLiteral("sender"));
+    config.setPassword(QStringLiteral("testpwd"));
     sender.connectToServer(config);
     senderLoop.exec();
     QCOMPARE(sender.isConnected(), true);
@@ -129,27 +129,27 @@ void tst_QXmppTransferManager::testSendFile()
     QXmppClient receiver;
     QXmppTransferManager *receiverManager = new QXmppTransferManager;
     receiverManager->setSupportedMethods(receiverMethods);
-    connect(receiverManager, SIGNAL(fileReceived(QXmppTransferJob*)),
-            this, SLOT(acceptFile(QXmppTransferJob*)));
+    connect(receiverManager, &QXmppTransferManager::fileReceived,
+            this, &tst_QXmppTransferManager::acceptFile);
     receiver.addExtension(receiverManager);
     receiver.setLogger(&logger);
 
     QEventLoop receiverLoop;
-    connect(&receiver, SIGNAL(connected()), &receiverLoop, SLOT(quit()));
-    connect(&receiver, SIGNAL(disconnected()), &receiverLoop, SLOT(quit()));
+    connect(&receiver, &QXmppClient::connected, &receiverLoop, &QEventLoop::quit);
+    connect(&receiver, &QXmppClient::disconnected, &receiverLoop, &QEventLoop::quit);
 
-    config.setUser("receiver");
-    config.setPassword("testpwd");
+    config.setUser(QStringLiteral("receiver"));
+    config.setPassword(QStringLiteral("testpwd"));
     receiver.connectToServer(config);
     receiverLoop.exec();
     QCOMPARE(receiver.isConnected(), true);
 
     // send file
     QEventLoop loop;
-    QXmppTransferJob *senderJob = senderManager->sendFile("receiver@localhost/QXmpp", ":/test.svg");
+    QXmppTransferJob *senderJob = senderManager->sendFile(QStringLiteral("receiver@localhost/QXmpp"), QStringLiteral(":/test.svg"));
     QVERIFY(senderJob);
     QCOMPARE(senderJob->localFileUrl(), QUrl::fromLocalFile(":/test.svg"));
-    connect(senderJob, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(senderJob, &QXmppTransferJob::finished, &loop, &QEventLoop::quit);
     loop.exec();
 
     if (works) {
@@ -158,7 +158,7 @@ void tst_QXmppTransferManager::testSendFile()
 
         // finish receiving file
         QVERIFY(receiverJob);
-        connect(receiverJob, SIGNAL(finished()), &loop, SLOT(quit()));
+        connect(receiverJob, &QXmppTransferJob::finished, &loop, &QEventLoop::quit);
         loop.exec();
 
         QCOMPARE(receiverJob->state(), QXmppTransferJob::FinishedState);

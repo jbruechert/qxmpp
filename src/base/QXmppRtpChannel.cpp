@@ -251,11 +251,11 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 {
     QXmppLoggable *logParent = qobject_cast<QXmppLoggable*>(parent);
     if (logParent) {
-        connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-                logParent, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        connect(this, &QXmppRtpAudioChannel::logMessage,
+                logParent, &QXmppLoggable::logMessage);
     }
     d->outgoingTimer = new QTimer(this);
-    connect(d->outgoingTimer, SIGNAL(timeout()), this, SLOT(writeDatagram()));
+    connect(d->outgoingTimer, &QTimer::timeout, this, &QXmppRtpAudioChannel::writeDatagram);
 
     // set supported codecs
     QXmppJinglePayloadType payload;
@@ -278,21 +278,21 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 
     payload.setId(G711u);
     payload.setChannels(1);
-    payload.setName("PCMU");
+    payload.setName(QStringLiteral("PCMU"));
     payload.setClockrate(8000);
     m_outgoingPayloadTypes << payload;
 
     payload.setId(G711a);
     payload.setChannels(1);
-    payload.setName("PCMA");
+    payload.setName(QStringLiteral("PCMA"));
     payload.setClockrate(8000);
     m_outgoingPayloadTypes << payload;
 
     QMap<QString, QString> parameters;
-    parameters.insert("events", "0-15");
+    parameters.insert(QStringLiteral("events"), QStringLiteral("0-15"));
     payload.setId(101);
     payload.setChannels(1);
-    payload.setName("telephone-event");
+    payload.setName(QStringLiteral("telephone-event"));
     payload.setClockrate(8000);
     payload.setParameters(parameters);
     m_outgoingPayloadTypes << payload;
@@ -361,7 +361,7 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
         if (codec)
             d->incomingCodecs.insert(packetType, codec);
         else
-            warning(QString("Could not find codec for RTP type %1").arg(QString::number(packetType)));
+            warning(QStringLiteral("Could not find codec for RTP type %1").arg(QString::number(packetType)));
     } else {
         codec = d->incomingCodecs.value(packetType);
     }
@@ -503,7 +503,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
     // create outgoing codec
     foreach (const QXmppJinglePayloadType &outgoingType, m_outgoingPayloadTypes) {
         // check for telephony events
-        if (outgoingType.name() == "telephone-event") {
+        if (outgoingType.name() == QLatin1String("telephone-event")) {
             d->outgoingTonesType = outgoingType;
         }
         else if (!d->outgoingCodec) {
@@ -583,7 +583,7 @@ void QXmppRtpAudioChannel::stopTone(QXmppRtpAudioChannel::Tone tone)
 qint64 QXmppRtpAudioChannel::writeData(const char * data, qint64 maxSize)
 {
     if (!d->outgoingCodec) {
-        warning("QXmppRtpAudioChannel::writeData before codec was set");
+        warning(QStringLiteral("QXmppRtpAudioChannel::writeData before codec was set"));
         return -1;
     }
 
@@ -984,7 +984,7 @@ QList<QXmppVideoFrame> QXmppRtpVideoChannel::readFrames()
 void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
 {
     if (!d->encoder) {
-        warning("QXmppRtpVideoChannel::writeFrame before codec was set");
+        warning(QStringLiteral("QXmppRtpVideoChannel::writeFrame before codec was set"));
         return;
     }
 

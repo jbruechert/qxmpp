@@ -57,7 +57,7 @@ void tst_QXmppServer::testConnect()
     QFETCH(QString, mechanism);
     QFETCH(bool, connected);
 
-    const QString testDomain("localhost");
+    const QString testDomain(QStringLiteral("localhost"));
     const QHostAddress testHost(QHostAddress::LocalHost);
     const quint16 testPort = 12345;
 
@@ -66,7 +66,7 @@ void tst_QXmppServer::testConnect()
 
     // prepare server
     TestPasswordChecker passwordChecker;
-    passwordChecker.addCredentials("testuser", "testpwd");
+    passwordChecker.addCredentials(QStringLiteral("testuser"), QStringLiteral("testpwd"));
 
     QXmppServer server;
     server.setDomain(testDomain);
@@ -79,10 +79,10 @@ void tst_QXmppServer::testConnect()
     client.setLogger(&logger);
 
     QEventLoop loop;
-    connect(&client, SIGNAL(connected()),
-            &loop, SLOT(quit()));
-    connect(&client, SIGNAL(disconnected()),
-            &loop, SLOT(quit()));
+    connect(&client, &QXmppClient::connected,
+            &loop, &QEventLoop::quit);
+    connect(&client, &QXmppClient::disconnected,
+            &loop, &QEventLoop::quit);
 
     QXmppConfiguration config;
     config.setDomain(testDomain);

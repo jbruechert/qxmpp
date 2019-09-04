@@ -97,20 +97,20 @@ void QXmppDialback::parse(const QDomElement &element)
         m_command = Result;
     else
         m_command = Verify;
-    m_type = element.attribute("type");
+    m_type = element.attribute(QStringLiteral("type"));
     m_key = element.text();
 }
 
 void QXmppDialback::toXml(QXmlStreamWriter *xmlWriter) const
 {
     if (m_command == Result)
-        xmlWriter->writeStartElement("db:result");
+        xmlWriter->writeStartElement(QStringLiteral("db:result"));
     else
-        xmlWriter->writeStartElement("db:verify");
-    helperToXmlAddAttribute(xmlWriter, "id", id());
+        xmlWriter->writeStartElement(QStringLiteral("db:verify"));
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("id"), id());
     helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", m_type);
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("from"), from());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), m_type);
     if (!m_key.isEmpty())
         xmlWriter->writeCharacters(m_key);
     xmlWriter->writeEndElement();

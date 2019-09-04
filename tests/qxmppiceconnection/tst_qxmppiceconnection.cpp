@@ -43,8 +43,8 @@ void tst_QXmppIceConnection::testBind()
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     QXmppIceConnection client;
-    connect(&client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(&client, &QXmppLoggable::logMessage,
+            &logger, &QXmppLogger::log);
     client.setIceControlling(true);
     client.addComponent(componentId);
 
@@ -69,14 +69,14 @@ void tst_QXmppIceConnection::testBindStun()
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
-    QHostInfo stunInfo = QHostInfo::fromName("stun.l.google.com");
+    QHostInfo stunInfo = QHostInfo::fromName(QStringLiteral("stun.l.google.com"));
     QVERIFY(!stunInfo.addresses().isEmpty());
 
     QXmppIceConnection client;
-    connect(&client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(&client, &QXmppLoggable::logMessage,
+            &logger, &QXmppLogger::log);
     client.setIceControlling(true);
-    client.setStunServer(stunInfo.addresses().first(), 19302);
+    client.setStunServer(stunInfo.addresses().constFirst(), 19302);
     client.addComponent(componentId);
 
     QXmppIceComponent *component = client.component(componentId);
@@ -87,8 +87,8 @@ void tst_QXmppIceConnection::testBindStun()
     QCOMPARE(client.gatheringState(), QXmppIceConnection::BusyGatheringState);
 
     QEventLoop loop;
-    connect(&client, SIGNAL(gatheringStateChanged()),
-            &loop, SLOT(quit()));
+    connect(&client, &QXmppIceConnection::gatheringStateChanged,
+            &loop, &QEventLoop::quit);
     loop.exec();
 
     bool foundReflexive = false;
@@ -113,15 +113,15 @@ void tst_QXmppIceConnection::testConnect()
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     QXmppIceConnection clientL;
-    connect(&clientL, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(&clientL, &QXmppLoggable::logMessage,
+            &logger, &QXmppLogger::log);
     clientL.setIceControlling(true);
     clientL.addComponent(componentId);
     clientL.bind(QXmppIceComponent::discoverAddresses());
 
     QXmppIceConnection clientR;
-    connect(&clientR, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(&clientR, &QXmppLoggable::logMessage,
+            &logger, &QXmppLogger::log);
     clientR.setIceControlling(false);
     clientR.addComponent(componentId);
     clientR.bind(QXmppIceComponent::discoverAddresses());
@@ -140,8 +140,8 @@ void tst_QXmppIceConnection::testConnect()
 
     // start ICE
     QEventLoop loop;
-    connect(&clientL, SIGNAL(connected()), &loop, SLOT(quit()));
-    connect(&clientR, SIGNAL(connected()), &loop, SLOT(quit()));
+    connect(&clientL, &QXmppIceConnection::connected, &loop, &QEventLoop::quit);
+    connect(&clientR, &QXmppIceConnection::connected, &loop, &QEventLoop::quit);
 
     clientL.connectToHost();
     clientR.connectToHost();

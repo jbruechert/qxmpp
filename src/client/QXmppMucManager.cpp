@@ -79,8 +79,8 @@ QXmppMucRoom *QXmppMucManager::addRoom(const QString &roomJid)
     if (!room) {
         room = new QXmppMucRoom(client(), roomJid, this);
         d->rooms.insert(roomJid, room);
-        connect(room, SIGNAL(destroyed(QObject*)),
-            this, SLOT(_q_roomDestroyed(QObject*)));
+        connect(room, &QObject::destroyed,
+            this, &QXmppMucManager::_q_roomDestroyed);
 
         // emit signal
         emit roomAdded(room);
@@ -109,7 +109,7 @@ QStringList QXmppMucManager::discoveryFeatures() const
 
 bool QXmppMucManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq")
+    if (element.tagName() == QLatin1String("iq"))
     {
         if (QXmppMucAdminIq::isMucAdminIq(element))
         {
@@ -150,8 +150,8 @@ void QXmppMucManager::setClient(QXmppClient* client)
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(_q_messageReceived(QXmppMessage)));
+    check = connect(client, &QXmppClient::messageReceived,
+                    this, &QXmppMucManager::_q_messageReceived);
     Q_ASSERT(check);
 }
 /// \endcond
@@ -190,29 +190,29 @@ QXmppMucRoom::QXmppMucRoom(QXmppClient *client, const QString &jid, QObject *par
     d->discoManager = client->findExtension<QXmppDiscoveryManager>();
     d->jid = jid;
 
-    check = connect(d->client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
+    check = connect(d->client, &QXmppClient::disconnected,
+                    this, &QXmppMucRoom::_q_disconnected);
     Q_ASSERT(check);
 
-    check = connect(d->client, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(_q_messageReceived(QXmppMessage)));
+    check = connect(d->client, &QXmppClient::messageReceived,
+                    this, &QXmppMucRoom::_q_messageReceived);
     Q_ASSERT(check);
 
-    check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    check = connect(d->client, &QXmppClient::presenceReceived,
+                    this, &QXmppMucRoom::_q_presenceReceived);
     Q_ASSERT(check);
 
     if (d->discoManager) {
-        check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                        this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
+        check = connect(d->discoManager, &QXmppDiscoveryManager::infoReceived,
+                        this, &QXmppMucRoom::_q_discoveryInfoReceived);
         Q_ASSERT(check);
     }
 
     // convenience signals for properties
-    check = connect(this, SIGNAL(joined()), this, SIGNAL(isJoinedChanged()));
+    check = connect(this, &QXmppMucRoom::joined, this, &QXmppMucRoom::isJoinedChanged);
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(left()), this, SIGNAL(isJoinedChanged()));
+    check = connect(this, &QXmppMucRoom::left, this, &QXmppMucRoom::isJoinedChanged);
     Q_ASSERT(check);
 }
 
@@ -589,7 +589,7 @@ void QXmppMucRoom::_q_discoveryInfoReceived(const QXmppDiscoveryIq &iq)
     if (iq.from() == d->jid) {
         QString name;
         foreach (const QXmppDiscoveryIq::Identity &identity, iq.identities()) {
-            if (identity.category() == "conference") {
+            if (identity.category() == QLatin1String("conference")) {
                 name = identity.name();
                 break;
             }

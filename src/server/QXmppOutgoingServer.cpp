@@ -64,8 +64,8 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     QSslSocket *socket = new QSslSocket(this);
     setSocket(socket);
 
-    check = connect(socket, SIGNAL(disconnected()),
-                    this, SLOT(_q_socketDisconnected()));
+    check = connect(socket, &QAbstractSocket::disconnected,
+                    this, &QXmppOutgoingServer::_q_socketDisconnected);
     Q_ASSERT(check);
 
     check = connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
@@ -73,15 +73,15 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     Q_ASSERT(check);
 
     // DNS lookups
-    check = connect(&d->dns, SIGNAL(finished()),
-                    this, SLOT(_q_dnsLookupFinished()));
+    check = connect(&d->dns, &QDnsLookup::finished,
+                    this, &QXmppOutgoingServer::_q_dnsLookupFinished);
     Q_ASSERT(check);
 
     d->dialbackTimer = new QTimer(this);
     d->dialbackTimer->setInterval(5000);
     d->dialbackTimer->setSingleShot(true);
-    check = connect(d->dialbackTimer, SIGNAL(timeout()),
-                    this, SLOT(sendDialback()));
+    check = connect(d->dialbackTimer, &QTimer::timeout,
+                    this, &QXmppOutgoingServer::sendDialback);
     Q_ASSERT(check);
 
     d->localDomain = domain;
@@ -109,7 +109,7 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
     d->remoteDomain = domain;
 
     // lookup server for domain
-    debug(QString("Looking up server for domain %1").arg(domain));
+    debug(QStringLiteral("Looking up server for domain %1").arg(domain));
     d->dns.setName("_xmpp-server._tcp." + domain);
     d->dns.setType(QDnsLookup::SRV);
     d->dns.lookup();
@@ -127,7 +127,7 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
         port = d->dns.serviceRecords().first().port();
     } else {
         // as a fallback, use domain as the host name
-        warning(QString("Lookup for domain %1 failed: %2")
+        warning(QStringLiteral("Lookup for domain %1 failed: %2")
                 .arg(d->dns.name(), d->dns.errorString()));
         host = d->remoteDomain;
         port = 5269;
@@ -137,13 +137,13 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     socket()->setPeerVerifyName(d->remoteDomain);
 
     // connect to server
-    info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
+    info(QStringLiteral("Connecting to %1:%2").arg(host, QString::number(port)));
     socket()->connectToHost(host, port);
 }
 
 void QXmppOutgoingServer::_q_socketDisconnected()
 {
-    debug("Socket disconnected");
+    debug(QStringLiteral("Socket disconnected"));
     emit disconnected();
 }
 
@@ -185,7 +185,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             if (!socket()->supportsSsl() &&
                  features.tlsMode() == QXmppStreamFeatures::Required)
             {
-                warning("Disconnecting as TLS is required, but SSL support is not available");
+                warning(QStringLiteral("Disconnecting as TLS is required, but SSL support is not available"));
                 disconnectFromHost();
                 return;
             }
@@ -207,7 +207,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
     {
         if (stanza.tagName() == QLatin1String("proceed"))
         {
-            debug("Starting encryption");
+            debug(QStringLiteral("Starting encryption"));
             socket()->startClientEncryption();
             return;
         }
@@ -222,14 +222,14 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             response.to() != d->localDomain ||
             response.type().isEmpty())
         {
-            warning("Invalid dialback response received");
+            warning(QStringLiteral("Invalid dialback response received"));
             return;
         }
         if (response.command() == QXmppDialback::Result)
         {
             if (response.type() == QLatin1String("valid"))
             {
-                info(QString("Outgoing server stream to %1 is ready").arg(response.from()));
+                info(QStringLiteral("Outgoing server stream to %1 is ready").arg(response.from()));
                 d->ready = true;
 
                 // send queued data
@@ -309,7 +309,7 @@ void QXmppOutgoingServer::sendDialback()
     if (!d->localStreamKey.isEmpty())
     {
         // send dialback key
-        debug(QString("Sending dialback result to %1").arg(d->remoteDomain));
+        debug(QStringLiteral("Sending dialback result to %1").arg(d->remoteDomain));
         QXmppDialback dialback;
         dialback.setCommand(QXmppDialback::Result);
         dialback.setFrom(d->localDomain);
@@ -333,7 +333,7 @@ void QXmppOutgoingServer::sendDialback()
 
 void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
 {
-    warning("SSL errors");
+    warning(QStringLiteral("SSL errors"));
     for(int i = 0; i < errors.count(); ++i)
         warning(errors.at(i).errorString());
     socket()->ignoreSslErrors();

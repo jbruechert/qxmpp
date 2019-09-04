@@ -117,14 +117,14 @@ bool QXmppResultSetQuery::isNull() const
 /// \cond
 void QXmppResultSetQuery::parse(const QDomElement& element)
 {
-    QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
+    QDomElement setElement = (element.tagName() == QLatin1String("set")) ? element : element.firstChildElement(QStringLiteral("set"));
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
-        m_max = setElement.firstChildElement("max").text().toInt(&ok);
+        m_max = setElement.firstChildElement(QStringLiteral("max")).text().toInt(&ok);
         if (!ok) m_max = -1;
-        m_after = setElement.firstChildElement("after").text();
-        m_before = setElement.firstChildElement("before").text();
-        m_index = setElement.firstChildElement("index").text().toInt(&ok);
+        m_after = setElement.firstChildElement(QStringLiteral("after")).text();
+        m_before = setElement.firstChildElement(QStringLiteral("before")).text();
+        m_index = setElement.firstChildElement(QStringLiteral("index")).text().toInt(&ok);
         if (!ok) m_index = -1;
     }
 }
@@ -133,16 +133,16 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter* writer) const
 {
     if (isNull())
         return;
-    writer->writeStartElement("set");
-    writer->writeAttribute("xmlns", ns_rsm);
+    writer->writeStartElement(QStringLiteral("set"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_rsm);
     if (m_max >= 0)
-        helperToXmlAddTextElement(writer, "max", QString::number(m_max));
+        helperToXmlAddTextElement(writer, QStringLiteral("max"), QString::number(m_max));
     if (!m_after.isNull())
-        helperToXmlAddTextElement(writer, "after", m_after);
+        helperToXmlAddTextElement(writer, QStringLiteral("after"), m_after);
     if (!m_before.isNull())
-        helperToXmlAddTextElement(writer, "before", m_before);
+        helperToXmlAddTextElement(writer, QStringLiteral("before"), m_before);
     if (m_index >= 0)
-        helperToXmlAddTextElement(writer, "index", QString::number(m_index));
+        helperToXmlAddTextElement(writer, QStringLiteral("index"), QString::number(m_index));
     writer->writeEndElement();
 }
 /// \endcond
@@ -230,15 +230,15 @@ bool QXmppResultSetReply::isNull() const
 /// \cond
 void QXmppResultSetReply::parse(const QDomElement& element)
 {
-    QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
+    QDomElement setElement = (element.tagName() == QLatin1String("set")) ? element : element.firstChildElement(QStringLiteral("set"));
     if (setElement.namespaceURI() == ns_rsm) {
-        m_count = setElement.firstChildElement("count").text().toInt();
-        QDomElement firstElem = setElement.firstChildElement("first");
+        m_count = setElement.firstChildElement(QStringLiteral("count")).text().toInt();
+        QDomElement firstElem = setElement.firstChildElement(QStringLiteral("first"));
         m_first = firstElem.text();
         bool ok = false;
-        m_index = firstElem.attribute("index").toInt(&ok);
+        m_index = firstElem.attribute(QStringLiteral("index")).toInt(&ok);
         if(!ok) m_index = -1;
-        m_last = setElement.firstChildElement("last").text();
+        m_last = setElement.firstChildElement(QStringLiteral("last")).text();
     }
 }
 
@@ -246,20 +246,20 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter* writer) const
 {
     if (isNull())
         return;
-    writer->writeStartElement("set");
-    writer->writeAttribute("xmlns", ns_rsm);
+    writer->writeStartElement(QStringLiteral("set"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_rsm);
     if (!m_first.isNull() || m_index >= 0) {
-        writer->writeStartElement("first");
+        writer->writeStartElement(QStringLiteral("first"));
         if (m_index >= 0)
-            writer->writeAttribute("index", QString::number(m_index));
+            writer->writeAttribute(QStringLiteral("index"), QString::number(m_index));
         writer->writeCharacters(m_first);
         writer->writeEndElement();
     }
     if (!m_last.isNull())
-        helperToXmlAddTextElement(writer, "last", m_last);
+        helperToXmlAddTextElement(writer, QStringLiteral("last"), m_last);
 
     if (m_count >= 0)
-        helperToXmlAddTextElement(writer, "count", QString::number(m_count));
+        helperToXmlAddTextElement(writer, QStringLiteral("count"), QString::number(m_count));
     writer->writeEndElement();
 }
 /// \endcond

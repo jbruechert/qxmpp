@@ -56,23 +56,23 @@ void QXmppIbbOpenIq::setSid( const QString &sid )
 /// \cond
 bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("open");
+    QDomElement openElement = element.firstChildElement(QStringLiteral("open"));
     return openElement.namespaceURI() == ns_ibb;
 }
 
 void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("open");
-    m_sid = openElement.attribute( "sid" );
-    m_block_size = openElement.attribute( "block-size" ).toLong();
+    QDomElement openElement = element.firstChildElement(QStringLiteral("open"));
+    m_sid = openElement.attribute( QStringLiteral("sid") );
+    m_block_size = openElement.attribute( QStringLiteral("block-size") ).toLong();
 }
 
 void QXmppIbbOpenIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("open");
-    writer->writeAttribute( "xmlns",ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
-    writer->writeAttribute( "block-size",QString::number(m_block_size) );
+    writer->writeStartElement(QStringLiteral("open"));
+    writer->writeAttribute( QStringLiteral("xmlns"),ns_ibb);
+    writer->writeAttribute( QStringLiteral("sid"),m_sid);
+    writer->writeAttribute( QStringLiteral("block-size"),QString::number(m_block_size) );
     writer->writeEndElement();
 }
 /// \endcond
@@ -95,21 +95,21 @@ void QXmppIbbCloseIq::setSid( const QString &sid )
 /// \cond
 bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("close");
+    QDomElement openElement = element.firstChildElement(QStringLiteral("close"));
     return openElement.namespaceURI() == ns_ibb;
 }
 
 void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement openElement = element.firstChildElement("close");
-    m_sid = openElement.attribute( "sid" );
+    QDomElement openElement = element.firstChildElement(QStringLiteral("close"));
+    m_sid = openElement.attribute( QStringLiteral("sid") );
 }
 
 void QXmppIbbCloseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("close");
-    writer->writeAttribute( "xmlns",ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
+    writer->writeStartElement(QStringLiteral("close"));
+    writer->writeAttribute( QStringLiteral("xmlns"),ns_ibb);
+    writer->writeAttribute( QStringLiteral("sid"),m_sid);
     writer->writeEndElement();
 }
 /// \endcond
@@ -151,24 +151,24 @@ void QXmppIbbDataIq::setPayload( const QByteArray &data )
 /// \cond
 bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
 {
-    QDomElement dataElement = element.firstChildElement("data");
+    QDomElement dataElement = element.firstChildElement(QStringLiteral("data"));
     return dataElement.namespaceURI() == ns_ibb;
 }
 
 void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement dataElement = element.firstChildElement("data");
-    m_sid = dataElement.attribute( "sid" );
-    m_seq = dataElement.attribute( "seq" ).toLong();
+    QDomElement dataElement = element.firstChildElement(QStringLiteral("data"));
+    m_sid = dataElement.attribute( QStringLiteral("sid") );
+    m_seq = dataElement.attribute( QStringLiteral("seq") ).toLong();
     m_payload = QByteArray::fromBase64( dataElement.text().toLatin1() );
 }
 
 void QXmppIbbDataIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("data");
-    writer->writeAttribute( "xmlns",ns_ibb);
-    writer->writeAttribute( "sid",m_sid);
-    writer->writeAttribute( "seq",QString::number(m_seq) );
+    writer->writeStartElement(QStringLiteral("data"));
+    writer->writeAttribute( QStringLiteral("xmlns"),ns_ibb);
+    writer->writeAttribute( QStringLiteral("sid"),m_sid);
+    writer->writeAttribute( QStringLiteral("seq"),QString::number(m_seq) );
     writer->writeCharacters( m_payload.toBase64() );
     writer->writeEndElement();
 }

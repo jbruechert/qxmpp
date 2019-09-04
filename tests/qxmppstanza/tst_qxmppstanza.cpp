@@ -46,15 +46,15 @@ void tst_QXmppStanza::testExtendedAddress_data()
         << QByteArray("<address jid=\"foo@example.com/QXmpp\" type=\"bcc\"/>")
         << false
         << QString()
-        << QString("foo@example.com/QXmpp")
-        << QString("bcc");
+        << QStringLiteral("foo@example.com/QXmpp")
+        << QStringLiteral("bcc");
 
     QTest::newRow("full")
         << QByteArray("<address delivered=\"true\" desc=\"some description\" jid=\"foo@example.com/QXmpp\" type=\"bcc\"/>")
         << true
-        << QString("some description")
-        << QString("foo@example.com/QXmpp")
-        << QString("bcc");
+        << QStringLiteral("some description")
+        << QStringLiteral("foo@example.com/QXmpp")
+        << QStringLiteral("bcc");
 }
 
 void tst_QXmppStanza::testExtendedAddress()

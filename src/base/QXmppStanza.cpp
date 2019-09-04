@@ -138,27 +138,27 @@ bool QXmppExtendedAddress::isValid() const
     return !d->type.isEmpty() && !d->jid.isEmpty();
 }
 
-/// \cond
+/// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
-    d->delivered = element.attribute("delivered") == "true";
-    d->description = element.attribute("desc");
-    d->jid = element.attribute("jid");
-    d->type = element.attribute("type");
+    d->delivered = element.attribute(QStringLiteral("delivered")) == QLatin1String("true");
+    d->description = element.attribute(QStringLiteral("desc"));
+    d->jid = element.attribute(QStringLiteral("jid"));
+    d->type = element.attribute(QStringLiteral("type"));
 }
 
 void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
-    xmlWriter->writeStartElement("address");
+    xmlWriter->writeStartElement(QStringLiteral("address"));
     if (d->delivered)
-        xmlWriter->writeAttribute("delivered", "true");
+        xmlWriter->writeAttribute(QStringLiteral("delivered"), QStringLiteral("true"));
     if (!d->description.isEmpty())
-        xmlWriter->writeAttribute("desc", d->description);
-    xmlWriter->writeAttribute("jid", d->jid);
-    xmlWriter->writeAttribute("type", d->type);
+        xmlWriter->writeAttribute(QStringLiteral("desc"), d->description);
+    xmlWriter->writeAttribute(QStringLiteral("jid"), d->jid);
+    xmlWriter->writeAttribute(QStringLiteral("type"), d->type);
     xmlWriter->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 QXmppStanza::Error::Error():
     m_code(0),
@@ -230,17 +230,17 @@ QString QXmppStanza::Error::getTypeStr() const
     switch(m_type)
     {
     case Cancel:
-        return "cancel";
+        return QStringLiteral("cancel");
     case Continue:
-        return "continue";
+        return QStringLiteral("continue");
     case Modify:
-        return "modify";
+        return QStringLiteral("modify");
     case Auth:
-        return "auth";
+        return QStringLiteral("auth");
     case Wait:
-        return "wait";
+        return QStringLiteral("wait");
     default:
-        return "";
+        return QLatin1String("");
     }
 }
 
@@ -251,15 +251,15 @@ QString QXmppStanza::Error::getConditionStr() const
 
 void QXmppStanza::Error::setTypeFromStr(const QString& type)
 {
-    if(type == "cancel")
+    if(type == QLatin1String("cancel"))
         setType(Cancel);
-    else if(type == "continue")
+    else if(type == QLatin1String("continue"))
         setType(Continue);
-    else if(type == "modify")
+    else if(type == QLatin1String("modify"))
         setType(Modify);
-    else if(type == "auth")
+    else if(type == QLatin1String("auth"))
         setType(Auth);
-    else if(type == "wait")
+    else if(type == QLatin1String("wait"))
         setType(Wait);
     else
         setType(static_cast<QXmppStanza::Error::Type>(-1));
@@ -272,15 +272,15 @@ void QXmppStanza::Error::setConditionFromStr(const QString& type)
 
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
-    setCode(errorElement.attribute("code").toInt());
-    setTypeFromStr(errorElement.attribute("type"));
+    setCode(errorElement.attribute(QStringLiteral("code")).toInt());
+    setTypeFromStr(errorElement.attribute(QStringLiteral("type")));
 
     QString text;
     QString cond;
     QDomElement element = errorElement.firstChildElement();
     while(!element.isNull())
     {
-        if(element.tagName() == "text")
+        if(element.tagName() == QLatin1String("text"))
             text = element.text();
         else if(element.namespaceURI() == ns_stanza)
         {
@@ -301,30 +301,30 @@ void QXmppStanza::Error::toXml( QXmlStreamWriter *writer ) const
     if(cond.isEmpty() && type.isEmpty())
         return;
 
-    writer->writeStartElement("error");
-    helperToXmlAddAttribute(writer, "type", type);
+    writer->writeStartElement(QStringLiteral("error"));
+    helperToXmlAddAttribute(writer, QStringLiteral("type"), type);
 
     if (m_code > 0)
-        helperToXmlAddAttribute(writer, "code", QString::number(m_code));
+        helperToXmlAddAttribute(writer, QStringLiteral("code"), QString::number(m_code));
 
     if(!cond.isEmpty())
     {
         writer->writeStartElement(cond);
-        writer->writeAttribute("xmlns", ns_stanza);
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_stanza);
         writer->writeEndElement();
     }
     if(!m_text.isEmpty())
     {
-        writer->writeStartElement("text");
-        writer->writeAttribute("xml:lang", "en");
-        writer->writeAttribute("xmlns", ns_stanza);
+        writer->writeStartElement(QStringLiteral("text"));
+        writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
+        writer->writeAttribute(QStringLiteral("xmlns"), ns_stanza);
         writer->writeCharacters(m_text);
         writer->writeEndElement();
     }
 
     writer->writeEndElement();
 }
-/// \endcond
+/// \endcond
 
 class QXmppStanzaPrivate : public QSharedData
 {
@@ -504,23 +504,23 @@ void QXmppStanza::generateAndSetNextId()
 
 void QXmppStanza::parse(const QDomElement &element)
 {
-    d->from = element.attribute("from");
-    d->to = element.attribute("to");
-    d->id = element.attribute("id");
-    d->lang = element.attribute("lang");
+    d->from = element.attribute(QStringLiteral("from"));
+    d->to = element.attribute(QStringLiteral("to"));
+    d->id = element.attribute(QStringLiteral("id"));
+    d->lang = element.attribute(QStringLiteral("lang"));
 
-    QDomElement errorElement = element.firstChildElement("error");
+    QDomElement errorElement = element.firstChildElement(QStringLiteral("error"));
     if(!errorElement.isNull())
         d->error.parse(errorElement);
 
     // XEP-0033: Extended Stanza Addressing
-    QDomElement addressElement = element.firstChildElement("addresses").firstChildElement("address");
+    QDomElement addressElement = element.firstChildElement(QStringLiteral("addresses")).firstChildElement(QStringLiteral("address"));
     while (!addressElement.isNull()) {
         QXmppExtendedAddress address;
         address.parse(addressElement);
         if (address.isValid())
             d->extendedAddresses << address;
-        addressElement = addressElement.nextSiblingElement("address");
+        addressElement = addressElement.nextSiblingElement(QStringLiteral("address"));
     }
 }
 
@@ -528,8 +528,8 @@ void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const
 {
     // XEP-0033: Extended Stanza Addressing
     if (!d->extendedAddresses.isEmpty()) {
-        xmlWriter->writeStartElement("addresses");
-        xmlWriter->writeAttribute("xmlns", ns_extended_addressing);
+        xmlWriter->writeStartElement(QStringLiteral("addresses"));
+        xmlWriter->writeAttribute(QStringLiteral("xmlns"), ns_extended_addressing);
         foreach (const QXmppExtendedAddress &address, d->extendedAddresses)
             address.toXml(xmlWriter);
         xmlWriter->writeEndElement();

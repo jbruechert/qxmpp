@@ -152,7 +152,7 @@ void tst_QXmppRosterIq::testMixChannel()
 
     item.setIsMixChannel(false);
     QCOMPARE(item.isMixChannel(), false);
-    item.setMixParticipantId("23a7n");
+    item.setMixParticipantId(QStringLiteral("23a7n"));
     QCOMPARE(item.mixParticipantId(), QString("23a7n"));
 }
 

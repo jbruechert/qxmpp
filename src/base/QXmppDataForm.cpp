@@ -439,14 +439,14 @@ void QXmppDataForm::parse(const QDomElement &element)
         return;
 
     /* form type */
-    const QString typeStr = element.attribute("type");
-    if (typeStr == "form")
+    const QString typeStr = element.attribute(QStringLiteral("type"));
+    if (typeStr == QLatin1String("form"))
         d->type = QXmppDataForm::Form;
-    else if (typeStr == "submit")
+    else if (typeStr == QLatin1String("submit"))
         d->type = QXmppDataForm::Submit;
-    else if (typeStr == "cancel")
+    else if (typeStr == QLatin1String("cancel"))
         d->type = QXmppDataForm::Cancel;
-    else if (typeStr == "result")
+    else if (typeStr == QLatin1String("result"))
         d->type = QXmppDataForm::Result;
     else
     {
@@ -455,17 +455,17 @@ void QXmppDataForm::parse(const QDomElement &element)
     }
 
     /* form properties */
-    d->title = element.firstChildElement("title").text();
-    d->instructions = element.firstChildElement("instructions").text();
+    d->title = element.firstChildElement(QStringLiteral("title")).text();
+    d->instructions = element.firstChildElement(QStringLiteral("instructions")).text();
 
-    QDomElement fieldElement = element.firstChildElement("field");
+    QDomElement fieldElement = element.firstChildElement(QStringLiteral("field"));
     while (!fieldElement.isNull())
     {
         QXmppDataForm::Field field;
 
         /* field type */
         QXmppDataForm::Field::Type type = QXmppDataForm::Field::TextSingleField;
-        const QString typeStr = fieldElement.attribute("type");
+        const QString typeStr = fieldElement.attribute(QStringLiteral("type"));
         struct field_type *ptr;
         for (ptr = field_types; ptr->str; ptr++)
         {
@@ -478,46 +478,46 @@ void QXmppDataForm::parse(const QDomElement &element)
         field.setType(type);
 
         /* field attributes */
-        field.setLabel(fieldElement.attribute("label"));
-        field.setKey(fieldElement.attribute("var"));
+        field.setLabel(fieldElement.attribute(QStringLiteral("label")));
+        field.setKey(fieldElement.attribute(QStringLiteral("var")));
 
         /* field value(s) */
         if (type == QXmppDataForm::Field::BooleanField)
         {
-            const QString valueStr = fieldElement.firstChildElement("value").text();
-            field.setValue(valueStr == "1" || valueStr == "true");
+            const QString valueStr = fieldElement.firstChildElement(QStringLiteral("value")).text();
+            field.setValue(valueStr == QLatin1String("1") || valueStr == QLatin1String("true"));
         }
         else if (type == QXmppDataForm::Field::ListMultiField ||
             type == QXmppDataForm::Field::JidMultiField ||
             type == QXmppDataForm::Field::TextMultiField)
         {
             QStringList values;
-            QDomElement valueElement = fieldElement.firstChildElement("value");
+            QDomElement valueElement = fieldElement.firstChildElement(QStringLiteral("value"));
             while (!valueElement.isNull())
             {
                 values.append(valueElement.text());
-                valueElement = valueElement.nextSiblingElement("value");
+                valueElement = valueElement.nextSiblingElement(QStringLiteral("value"));
             }
             field.setValue(values);
         }
         else
         {
-            field.setValue(fieldElement.firstChildElement("value").text());
+            field.setValue(fieldElement.firstChildElement(QStringLiteral("value")).text());
         }
 
         /* field media */
-        QDomElement mediaElement = fieldElement.firstChildElement("media");
+        QDomElement mediaElement = fieldElement.firstChildElement(QStringLiteral("media"));
         if (!mediaElement.isNull()) {
             Media media;
-            media.setHeight(mediaElement.attribute("height", "-1").toInt());
-            media.setWidth(mediaElement.attribute("width", "-1").toInt());
+            media.setHeight(mediaElement.attribute(QStringLiteral("height"), QStringLiteral("-1")).toInt());
+            media.setWidth(mediaElement.attribute(QStringLiteral("width"), QStringLiteral("-1")).toInt());
 
             QList<QPair<QString, QString> > uris;
-            QDomElement uriElement = mediaElement.firstChildElement("uri");
+            QDomElement uriElement = mediaElement.firstChildElement(QStringLiteral("uri"));
             while (!uriElement.isNull()) {
-                uris.append(QPair<QString, QString>(uriElement.attribute("type"),
+                uris.append(QPair<QString, QString>(uriElement.attribute(QStringLiteral("type")),
                     uriElement.text()));
-                uriElement = uriElement.nextSiblingElement("uri");
+                uriElement = uriElement.nextSiblingElement(QStringLiteral("uri"));
             }
             media.setUris(uris);
             field.setMedia(media);
@@ -528,23 +528,23 @@ void QXmppDataForm::parse(const QDomElement &element)
             type == QXmppDataForm::Field::ListSingleField)
         {
             QList<QPair<QString, QString> > options;
-            QDomElement optionElement = fieldElement.firstChildElement("option");
+            QDomElement optionElement = fieldElement.firstChildElement(QStringLiteral("option"));
             while (!optionElement.isNull())
             {
-                options.append(QPair<QString, QString>(optionElement.attribute("label"),
-                    optionElement.firstChildElement("value").text()));
-                optionElement = optionElement.nextSiblingElement("option");
+                options.append(QPair<QString, QString>(optionElement.attribute(QStringLiteral("label")),
+                    optionElement.firstChildElement(QStringLiteral("value")).text()));
+                optionElement = optionElement.nextSiblingElement(QStringLiteral("option"));
             }
             field.setOptions(options);
         }
 
         /* other properties */
-        field.setDescription(fieldElement.firstChildElement("description").text());
-        field.setRequired(!fieldElement.firstChildElement("required").isNull());
+        field.setDescription(fieldElement.firstChildElement(QStringLiteral("description")).text());
+        field.setRequired(!fieldElement.firstChildElement(QStringLiteral("required")).isNull());
 
         d->fields.append(field);
 
-        fieldElement = fieldElement.nextSiblingElement("field");
+        fieldElement = fieldElement.nextSiblingElement(QStringLiteral("field"));
     }
 }
 
@@ -553,29 +553,29 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
     if (isNull())
         return;
 
-    writer->writeStartElement("x");
-    writer->writeAttribute("xmlns", ns_data);
+    writer->writeStartElement(QStringLiteral("x"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_data);
 
     /* form type */
     QString typeStr;
     if (d->type == QXmppDataForm::Form)
-        typeStr = "form";
+        typeStr = QStringLiteral("form");
     else if (d->type == QXmppDataForm::Submit)
-        typeStr = "submit";
+        typeStr = QStringLiteral("submit");
     else if (d->type == QXmppDataForm::Cancel)
-        typeStr = "cancel";
+        typeStr = QStringLiteral("cancel");
     else if (d->type == QXmppDataForm::Result)
-        typeStr = "result";
-    writer->writeAttribute("type", typeStr);
+        typeStr = QStringLiteral("result");
+    writer->writeAttribute(QStringLiteral("type"), typeStr);
 
     /* form properties */
     if (!d->title.isEmpty())
-        writer->writeTextElement("title", d->title);
+        writer->writeTextElement(QStringLiteral("title"), d->title);
     if (!d->instructions.isEmpty())
-        writer->writeTextElement("instructions", d->instructions);
+        writer->writeTextElement(QStringLiteral("instructions"), d->instructions);
 
     foreach (const QXmppDataForm::Field &field, d->fields) {
-        writer->writeStartElement("field");
+        writer->writeStartElement(QStringLiteral("field"));
 
         /* field type */
         const QXmppDataForm::Field::Type type = field.type();
@@ -589,43 +589,43 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
                 break;
             }
         }
-        writer->writeAttribute("type", typeStr);
+        writer->writeAttribute(QStringLiteral("type"), typeStr);
 
         /* field attributes */
-        helperToXmlAddAttribute(writer, "label", field.label());
-        helperToXmlAddAttribute(writer, "var", field.key());
+        helperToXmlAddAttribute(writer, QStringLiteral("label"), field.label());
+        helperToXmlAddAttribute(writer, QStringLiteral("var"), field.key());
 
         /* field value(s) */
         if (type == QXmppDataForm::Field::BooleanField)
         {
-            helperToXmlAddTextElement(writer, "value", field.value().toBool() ? "1" : "0");
+            helperToXmlAddTextElement(writer, QStringLiteral("value"), field.value().toBool() ? "1" : "0");
         }
         else if (type == QXmppDataForm::Field::ListMultiField ||
             type == QXmppDataForm::Field::JidMultiField ||
             type == QXmppDataForm::Field::TextMultiField)
         {
             foreach (const QString &value, field.value().toStringList())
-                helperToXmlAddTextElement(writer, "value", value);
+                helperToXmlAddTextElement(writer, QStringLiteral("value"), value);
         }
         else if (!field.value().isNull())
         {
-            helperToXmlAddTextElement(writer, "value", field.value().toString());
+            helperToXmlAddTextElement(writer, QStringLiteral("value"), field.value().toString());
         }
 
         /* field media */
         Media media = field.media();
         if (!media.isNull()) {
-            writer->writeStartElement("media");
-            helperToXmlAddAttribute(writer, "xmlns", ns_media_element);
+            writer->writeStartElement(QStringLiteral("media"));
+            helperToXmlAddAttribute(writer, QStringLiteral("xmlns"), ns_media_element);
             if (media.height() > 0)
-                helperToXmlAddAttribute(writer, "height", QString::number(media.height()));
+                helperToXmlAddAttribute(writer, QStringLiteral("height"), QString::number(media.height()));
             if (media.width() > 0)
-                helperToXmlAddAttribute(writer, "width", QString::number(media.width()));
+                helperToXmlAddAttribute(writer, QStringLiteral("width"), QString::number(media.width()));
 
             QPair<QString, QString> uri;
             foreach(uri, media.uris()) {
-                writer->writeStartElement("uri");
-                helperToXmlAddAttribute(writer, "type", uri.first);
+                writer->writeStartElement(QStringLiteral("uri"));
+                helperToXmlAddAttribute(writer, QStringLiteral("type"), uri.first);
                 writer->writeCharacters(uri.second);
                 writer->writeEndElement();
             }
@@ -639,18 +639,18 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             QPair<QString, QString> option;
             foreach (option, field.options())
             {
-                writer->writeStartElement("option");
-                helperToXmlAddAttribute(writer, "label", option.first);
-                helperToXmlAddTextElement(writer, "value", option.second);
+                writer->writeStartElement(QStringLiteral("option"));
+                helperToXmlAddAttribute(writer, QStringLiteral("label"), option.first);
+                helperToXmlAddTextElement(writer, QStringLiteral("value"), option.second);
                 writer->writeEndElement();
             }
         }
 
         /* other properties */
         if (!field.description().isEmpty())
-            helperToXmlAddTextElement(writer, "description", field.description());
+            helperToXmlAddTextElement(writer, QStringLiteral("description"), field.description());
         if (field.isRequired())
-            helperToXmlAddTextElement(writer, "required", "");
+            helperToXmlAddTextElement(writer, QStringLiteral("required"), QLatin1String(""));
 
         writer->writeEndElement();
     }

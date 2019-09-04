@@ -66,26 +66,26 @@ void QXmppEntityTimeIq::setUtc(const QDateTime &utc)
 /// \cond
 bool QXmppEntityTimeIq::isEntityTimeIq(const QDomElement &element)
 {
-    QDomElement timeElement = element.firstChildElement("time");
+    QDomElement timeElement = element.firstChildElement(QStringLiteral("time"));
     return timeElement.namespaceURI() == ns_entity_time;
 }
 
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement timeElement = element.firstChildElement("time");
-    m_tzo = QXmppUtils::timezoneOffsetFromString(timeElement.firstChildElement("tzo").text());
-    m_utc = QXmppUtils::datetimeFromString(timeElement.firstChildElement("utc").text());
+    QDomElement timeElement = element.firstChildElement(QStringLiteral("time"));
+    m_tzo = QXmppUtils::timezoneOffsetFromString(timeElement.firstChildElement(QStringLiteral("tzo")).text());
+    m_utc = QXmppUtils::datetimeFromString(timeElement.firstChildElement(QStringLiteral("utc")).text());
 }
 
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("time");
-    writer->writeAttribute("xmlns", ns_entity_time);
+    writer->writeStartElement(QStringLiteral("time"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_entity_time);
 
     if(m_utc.isValid())
     {
-        helperToXmlAddTextElement(writer, "tzo", QXmppUtils::timezoneOffsetToString(m_tzo));
-        helperToXmlAddTextElement(writer, "utc", QXmppUtils::datetimeToString(m_utc));
+        helperToXmlAddTextElement(writer, QStringLiteral("tzo"), QXmppUtils::timezoneOffsetToString(m_tzo));
+        helperToXmlAddTextElement(writer, QStringLiteral("utc"), QXmppUtils::datetimeToString(m_utc));
     }
     writer->writeEndElement();
 }

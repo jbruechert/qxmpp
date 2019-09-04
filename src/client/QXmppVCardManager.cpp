@@ -109,7 +109,7 @@ QStringList QXmppVCardManager::discoveryFeatures() const
 
 bool QXmppVCardManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() == "iq" && QXmppVCardIq::isVCard(element))
+    if(element.tagName() == QLatin1String("iq") && QXmppVCardIq::isVCard(element))
     {
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);

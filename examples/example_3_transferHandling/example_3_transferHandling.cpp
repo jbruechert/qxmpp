@@ -42,7 +42,7 @@ xmppClient::xmppClient(QObject *parent)
 
     // add transfer manager
     transferManager = new QXmppTransferManager;
-    transferManager->setProxy("proxy.qxmpp.org");
+    transferManager->setProxy(QStringLiteral("proxy.qxmpp.org"));
     addExtension(transferManager);
 
     // uncomment one of the following if you only want to use a specific transfer method:
@@ -50,12 +50,12 @@ xmppClient::xmppClient(QObject *parent)
     // transferManager->setSupportedMethods(QXmppTransferJob::InBandMethod);
     // transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
-    check = connect(this, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(slotPresenceReceived(QXmppPresence)));
+    check = connect(this, &QXmppClient::presenceReceived,
+                    this, &xmppClient::slotPresenceReceived);
     Q_ASSERT(check);
 
-    check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
-                    this, SLOT(slotFileReceived(QXmppTransferJob*)));
+    check = connect(transferManager, &QXmppTransferManager::fileReceived,
+                    this, &xmppClient::slotFileReceived);
     Q_ASSERT(check);
 }
 
@@ -84,12 +84,12 @@ void xmppClient::slotFileReceived(QXmppTransferJob *job)
                     this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(slotFinished()));
+    check = connect(job, &QXmppTransferJob::finished,
+                    this, &xmppClient::slotFinished);
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)),
-                    this, SLOT(slotProgress(qint64,qint64)));
+    check = connect(job, &QXmppTransferJob::progress,
+                    this, &xmppClient::slotProgress);
     Q_ASSERT(check);
 
     // allocate a buffer to receive the file
@@ -120,18 +120,18 @@ void xmppClient::slotPresenceReceived(const QXmppPresence &presence)
         return;
 
     // send the file and connect to the job's signals
-    QXmppTransferJob *job = transferManager->sendFile(presence.from(), ":/example_3_transferHandling.cpp", "example source code");
+    QXmppTransferJob *job = transferManager->sendFile(presence.from(), QStringLiteral(":/example_3_transferHandling.cpp"), QStringLiteral("example source code"));
 
     check = connect(job, SIGNAL(error(QXmppTransferJob::Error)),
                     this, SLOT(slotError(QXmppTransferJob::Error)));
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(finished()),
-                    this, SLOT(slotFinished()));
+    check = connect(job, &QXmppTransferJob::finished,
+                    this, &xmppClient::slotFinished);
     Q_ASSERT(check);
 
-    check = connect(job, SIGNAL(progress(qint64,qint64)),
-                    this, SLOT(slotProgress(qint64,qint64)));
+    check = connect(job, &QXmppTransferJob::progress,
+                    this, &xmppClient::slotProgress);
     Q_ASSERT(check);
 }
 
@@ -156,10 +156,10 @@ int main(int argc, char *argv[])
     xmppClient client;
     client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
     if (!strcmp(argv[1], "send")) {
-        client.setRecipient("qxmpp.test2@qxmpp.org");
-        client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+        client.setRecipient(QStringLiteral("qxmpp.test2@qxmpp.org"));
+        client.connectToServer(QStringLiteral("qxmpp.test1@qxmpp.org"), QStringLiteral("qxmpp123"));
     } else {
-        client.connectToServer("qxmpp.test2@qxmpp.org", "qxmpp456");
+        client.connectToServer(QStringLiteral("qxmpp.test2@qxmpp.org"), QStringLiteral("qxmpp456"));
     }
 
     return a.exec();

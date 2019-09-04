@@ -463,9 +463,9 @@ void tst_QXmppMessage::testChatMarkers()
                     "type=\"chat\"/>");
 
     QXmppMessage serialisationMessage;
-    serialisationMessage.setFrom("kingrichard@royalty.england.lit/throne");
-    serialisationMessage.setTo("northumberland@shakespeare.lit/westminster");
-    serialisationMessage.setId("message-3");
+    serialisationMessage.setFrom(QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    serialisationMessage.setTo(QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    serialisationMessage.setId(QStringLiteral("message-3"));
     serialisationMessage.setMarkable(false);
     serializePacket(serialisationMessage, notMarkableSerialisation);
 
@@ -493,7 +493,7 @@ void tst_QXmppMessage::testChatMarkers()
 
     serialisationMessage.setMarkable(false);
     serialisationMessage.setMarker(QXmppMessage::Received);
-    serialisationMessage.setMarkerId("message-2");
+    serialisationMessage.setMarkerId(QStringLiteral("message-2"));
     serializePacket(serialisationMessage, receivedSerialisation);
 
     const QByteArray receivedThreadSerialisation(
@@ -508,8 +508,8 @@ void tst_QXmppMessage::testChatMarkers()
                 "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Received);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarkerId(QStringLiteral("message-2"));
+    serialisationMessage.setMarkedThread(QStringLiteral("sleeping"));
     serializePacket(serialisationMessage, receivedThreadSerialisation);
 
     const QByteArray displayedThreadSerialisation(
@@ -524,8 +524,8 @@ void tst_QXmppMessage::testChatMarkers()
                 "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Displayed);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarkerId(QStringLiteral("message-2"));
+    serialisationMessage.setMarkedThread(QStringLiteral("sleeping"));
     serializePacket(serialisationMessage, displayedThreadSerialisation);
 
     const QByteArray acknowledgedThreadSerialisation(
@@ -540,8 +540,8 @@ void tst_QXmppMessage::testChatMarkers()
                 "</message>");
 
     serialisationMessage.setMarker(QXmppMessage::Acknowledged);
-    serialisationMessage.setMarkerId("message-2");
-    serialisationMessage.setMarkedThread("sleeping");
+    serialisationMessage.setMarkerId(QStringLiteral("message-2"));
+    serialisationMessage.setMarkedThread(QStringLiteral("sleeping"));
     serializePacket(serialisationMessage, acknowledgedThreadSerialisation);
 }
 
@@ -586,8 +586,8 @@ void tst_QXmppMessage::testOutOfBandUrl()
             "</x>"
         "</message>"
     );
-    const QString firstUrl = "http://www.jabber.org/images/psa-license.jpg";
-    const QString newUrl = "https://xmpp.org/theme/images/xmpp-logo.svg";
+    const QString firstUrl = QStringLiteral("http://www.jabber.org/images/psa-license.jpg");
+    const QString newUrl = QStringLiteral("https://xmpp.org/theme/images/xmpp-logo.svg");
 
     QXmppMessage oobMessage;
     parsePacket(oobMessage, oobXml);
@@ -614,7 +614,7 @@ void tst_QXmppMessage::testMessageCorrect()
     QCOMPARE(message.replaceId(), QString("badmessage"));
     serializePacket(message, xml);
 
-    message.setReplaceId("someotherid");
+    message.setReplaceId(QStringLiteral("someotherid"));
     QCOMPARE(message.replaceId(), QString("someotherid"));
 }
 
@@ -639,9 +639,9 @@ void tst_QXmppMessage::testMix()
     QCOMPARE(message.mixUserJid(), QString("hag66@shakespeare.example"));
     QCOMPARE(message.mixUserNick(), QString("thirdwitch"));
 
-    message.setMixUserJid("alexander@example.org");
+    message.setMixUserJid(QStringLiteral("alexander@example.org"));
     QCOMPARE(message.mixUserJid(), QString("alexander@example.org"));
-    message.setMixUserNick("erik");
+    message.setMixUserNick(QStringLiteral("erik"));
     QCOMPARE(message.mixUserNick(), QString("erik"));
 }
 
@@ -670,7 +670,7 @@ void tst_QXmppMessage::testSpoiler()
     QXmppMessage messageWithoutHint;
     parsePacket(messageWithoutHint, xmlWithoutHint);
     QVERIFY(messageWithoutHint.isSpoiler());
-    QCOMPARE(messageWithoutHint.spoilerHint(), QString(""));
+    QCOMPARE(messageWithoutHint.spoilerHint(), QLatin1String(""));
     serializePacket(messageWithoutHint, xmlWithoutHint);
 
     // test setters
@@ -679,7 +679,7 @@ void tst_QXmppMessage::testSpoiler()
     QVERIFY(message.isSpoiler());
 
     message.setIsSpoiler(false);
-    message.setSpoilerHint("test hint");
+    message.setSpoilerHint(QStringLiteral("test hint"));
     QCOMPARE(message.spoilerHint(), QString("test hint"));
     QVERIFY(message.isSpoiler());
 }

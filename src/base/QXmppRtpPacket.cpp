@@ -224,7 +224,7 @@ void QXmppRtpPacket::setType(quint8 type)
 
 QString QXmppRtpPacket::toString() const
 {
-    return QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+    return QStringLiteral("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
         QString::number(d->sequence),
         QString::number(d->stamp),
         QString::number(d->marker),

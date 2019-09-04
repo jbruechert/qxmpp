@@ -118,7 +118,7 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
         return QDateTime();
 
     // process date and time
-    QDateTime dt = QDateTime::fromString(str.left(19), "yyyy-MM-ddThh:mm:ss");
+    QDateTime dt = QDateTime::fromString(str.left(19), QStringLiteral("yyyy-MM-ddThh:mm:ss"));
     dt.setTimeSpec(Qt::UTC);
 
     // process milliseconds
@@ -129,10 +129,10 @@ QDateTime QXmppUtils::datetimeFromString(const QString &str)
     }
 
     // process time zone
-    if (tzRe.cap(1) != "Z")
+    if (tzRe.cap(1) != QLatin1String("Z"))
     {
         int offset = tzRe.cap(3).toInt() * 3600 + tzRe.cap(4).toInt() * 60;
-        if (tzRe.cap(2) == "+")
+        if (tzRe.cap(2) == QLatin1String("+"))
             dt = dt.addSecs(-offset);
         else
             dt = dt.addSecs(offset);
@@ -147,9 +147,9 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
 {
     QDateTime utc = dt.toUTC();
     if (utc.time().msec())
-        return utc.toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ss.zzzZ"));
     else
-        return utc.toString("yyyy-MM-ddThh:mm:ssZ");
+        return utc.toString(QStringLiteral("yyyy-MM-ddThh:mm:ssZ"));
 }
 
 /// Parses a timezone offset (in seconds) from a string according to
@@ -162,13 +162,13 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
         return 0;
 
     // No offset from UTC
-    if (tzRe.cap(1) == "Z")
+    if (tzRe.cap(1) == QLatin1String("Z"))
         return 0;
 
     // Calculate offset
     const int offset = tzRe.cap(3).toInt() * 3600 +
                        tzRe.cap(4).toInt() * 60;
-    if (tzRe.cap(2) == "-")
+    if (tzRe.cap(2) == QLatin1String("-"))
         return -offset;
     else
         return offset;
@@ -180,17 +180,17 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
     if (!secs)
-        return QString::fromLatin1("Z");
+        return QStringLiteral("Z");
 
     const QTime tzoTime = QTime(0, 0, 0).addSecs(qAbs(secs));
-    return (secs < 0 ? "-" : "+") + tzoTime.toString("hh:mm");
+    return (secs < 0 ? "-" : "+") + tzoTime.toString(QStringLiteral("hh:mm"));
 }
 
 /// Returns the domain for the given \a jid.
 
 QString QXmppUtils::jidToDomain(const QString &jid)
 {
-    return jidToBareJid(jid).split("@").last();
+    return jidToBareJid(jid).split(QStringLiteral("@")).last();
 }
 
 /// Returns the resource for the given \a jid.
@@ -300,7 +300,7 @@ QByteArray QXmppUtils::generateRandomBytes(int length)
 
 QString QXmppUtils::generateStanzaHash(int length)
 {
-    const QString somechars = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const QString somechars = QStringLiteral("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
     const int N = somechars.size();
     QString hashResult;
     for ( int idx = 0; idx < length; ++idx )

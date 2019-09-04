@@ -60,7 +60,7 @@ void tst_QXmppVCardIq::testAddress_data()
     QTest::newRow("locality") << QByteArray("<ADR><LOCALITY>Paris</LOCALITY></ADR>") << int(QXmppVCardAddress::None) << "" << "Paris" << "" << "" << "" << false;
     QTest::newRow("postcode") << QByteArray("<ADR><PCODE>75008</PCODE></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "75008" << "" << "" << false;
     QTest::newRow("region") << QByteArray("<ADR><REGION>Ile de France</REGION></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "Ile de France" << "" << false;
-    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << QString::fromUtf8("55 rue du faubourg Saint-Honoré") << false;
+    QTest::newRow("street") << QByteArray("<ADR><STREET>55 rue du faubourg Saint-Honoré</STREET></ADR>") << int(QXmppVCardAddress::None) << "" << "" << "" << "" << QStringLiteral("55 rue du faubourg Saint-Honoré") << false;
 }
 
 void tst_QXmppVCardIq::testAddress()

@@ -55,7 +55,7 @@ QStringList QXmppEntityTimeManager::discoveryFeatures() const
 
 bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element))
+    if(element.tagName() == QLatin1String("iq") && QXmppEntityTimeIq::isEntityTimeIq(element))
     {
         QXmppEntityTimeIq entityTime;
         entityTime.parse(element);

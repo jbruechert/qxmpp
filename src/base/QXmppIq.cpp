@@ -104,7 +104,7 @@ void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    const QString type = element.attribute("type");
+    const QString type = element.attribute(QStringLiteral("type"));
     for (int i = Error; i <= Result; i++) {
         if (type == iq_types[i]) {
             d->type = static_cast<Type>(i);
@@ -129,12 +129,12 @@ void QXmppIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppIq::toXml( QXmlStreamWriter *xmlWriter ) const
 {
-    xmlWriter->writeStartElement("iq");
+    xmlWriter->writeStartElement(QStringLiteral("iq"));
 
-    helperToXmlAddAttribute(xmlWriter, "id", id());
-    helperToXmlAddAttribute(xmlWriter, "to", to());
-    helperToXmlAddAttribute(xmlWriter, "from", from());
-    helperToXmlAddAttribute(xmlWriter, "type", iq_types[d->type]);
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("id"), id());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("to"), to());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("from"), from());
+    helperToXmlAddAttribute(xmlWriter, QStringLiteral("type"), iq_types[d->type]);
     toXmlElementFromChild(xmlWriter);
     error().toXml(xmlWriter);
     xmlWriter->writeEndElement();

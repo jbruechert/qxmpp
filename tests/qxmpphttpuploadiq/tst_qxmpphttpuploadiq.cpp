@@ -60,11 +60,11 @@ void tst_QXmppHttpUploadIq::testRequest()
     serializePacket(iq, xml);
 
     // test setters
-    iq.setFileName("icon.png");
+    iq.setFileName(QStringLiteral("icon.png"));
     QCOMPARE(iq.fileName(), QString("icon.png"));
     iq.setSize(23421337);
     QCOMPARE(iq.size(), 23421337);
-    iq.setContentType(QMimeDatabase().mimeTypeForName("image/png"));
+    iq.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
     QCOMPARE(iq.contentType().name(), QString("image/png"));
 }
 
@@ -123,15 +123,15 @@ void tst_QXmppHttpUploadIq::testSlot()
     QCOMPARE(iq.getUrl(), QUrl("https://download.montague.tld/4a771ac1-f0b2-4a"
                                "4a-9700-f2a26fa2bb67/tr%C3%A8s%20cool.jpg"));
     QMap<QString, QString> headers;
-    headers["Authorization"] = "Basic Base64String==";
-    headers["Cookie"] = "foo=bar; user=romeo";
+    headers[QStringLiteral("Authorization")] = QLatin1String("Basic Base64String==");
+    headers[QStringLiteral("Cookie")] = QLatin1String("foo=bar; user=romeo");
     QCOMPARE(iq.putHeaders(), headers);
     serializePacket(iq, xml);
 
     // test setters
-    iq.setGetUrl(QUrl("https://dl.example.org/user/file"));
+    iq.setGetUrl(QUrl(QStringLiteral("https://dl.example.org/user/file")));
     QCOMPARE(iq.getUrl(), QUrl("https://dl.example.org/user/file"));
-    iq.setPutUrl(QUrl("https://ul.example.org/user/file"));
+    iq.setPutUrl(QUrl(QStringLiteral("https://ul.example.org/user/file")));
     QCOMPARE(iq.putUrl(), QUrl("https://ul.example.org/user/file"));
     QMap<QString, QString> emptyMap;
     iq.setPutHeaders(emptyMap);

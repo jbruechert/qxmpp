@@ -108,13 +108,13 @@ void tst_QXmppRpcIq::testNil()
 
 void tst_QXmppRpcIq::testString()
 {
-    checkVariant(QString("hello world"),
+    checkVariant(QStringLiteral("hello world"),
                  QByteArray("<value><string>hello world</string></value>"));
 }
 
 void tst_QXmppRpcIq::testArray()
 {
-    checkVariant(QVariantList() << QString("hello world") << double(-12.214),
+    checkVariant(QVariantList() << QStringLiteral("hello world") << double(-12.214),
                  QByteArray("<value><array><data>"
                             "<value><string>hello world</string></value>"
                             "<value><double>-12.214</double></value>"
@@ -124,8 +124,8 @@ void tst_QXmppRpcIq::testArray()
 void tst_QXmppRpcIq::testStruct()
 {
     QMap<QString, QVariant> map;
-    map["bar"] = QString("hello world");
-    map["foo"] = double(-12.214);
+    map[QStringLiteral("bar")] = QStringLiteral("hello world");
+    map[QStringLiteral("foo")] = double(-12.214);
     checkVariant(map,
                  QByteArray("<value><struct>"
                             "<member>"

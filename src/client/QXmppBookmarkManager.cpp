@@ -63,21 +63,21 @@ void QXmppPrivateStorageIq::setBookmarks(const QXmppBookmarkSet &bookmarks)
 
 bool QXmppPrivateStorageIq::isPrivateStorageIq(const QDomElement &element)
 {
-    const QDomElement queryElement = element.firstChildElement("query");
+    const QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return queryElement.namespaceURI() == ns_private &&
            QXmppBookmarkSet::isBookmarkSet(queryElement.firstChildElement());
 }
 
 void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)
 {
-    const QDomElement queryElement = element.firstChildElement("query");
+    const QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     m_bookmarks.parse(queryElement.firstChildElement());
 }
 
 void QXmppPrivateStorageIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_private);
+    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_private);
     m_bookmarks.toXml(writer);
     writer->writeEndElement();
 }
@@ -150,18 +150,18 @@ void QXmppBookmarkManager::setClient(QXmppClient *client)
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(connected()),
-                    this, SLOT(slotConnected()));
+    check = connect(client, &QXmppClient::connected,
+                    this, &QXmppBookmarkManager::slotConnected);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(slotDisconnected()));
+    check = connect(client, &QXmppClient::disconnected,
+                    this, &QXmppBookmarkManager::slotDisconnected);
     Q_ASSERT(check);
 }
 
 bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() == "iq")
+    if (stanza.tagName() == QLatin1String("iq"))
     {
         if (QXmppPrivateStorageIq::isPrivateStorageIq(stanza))
         {
@@ -176,7 +176,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
             }
             return true;
         }
-        else if (!d->pendingId.isEmpty() && stanza.attribute("id") == d->pendingId)
+        else if (!d->pendingId.isEmpty() && stanza.attribute(QStringLiteral("id")) == d->pendingId)
         {
             QXmppIq iq;
             iq.parse(stanza);

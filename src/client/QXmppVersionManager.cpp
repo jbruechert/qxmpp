@@ -151,7 +151,7 @@ QStringList QXmppVersionManager::discoveryFeatures() const
 
 bool QXmppVersionManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element))
+    if (element.tagName() == QLatin1String("iq") && QXmppVersionIq::isVersionIq(element))
     {
         QXmppVersionIq versionIq;
         versionIq.parse(element);

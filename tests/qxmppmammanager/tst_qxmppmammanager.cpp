@@ -65,11 +65,11 @@ private:
 
 void tst_QXmppMamManager::initTestCase()
 {
-    connect(&m_manager, SIGNAL(archivedMessageReceived(const QString&, const QXmppMessage&)),
-            &m_helper, SLOT(archivedMessageReceived(const QString&, const QXmppMessage&)));
+    connect(&m_manager, &QXmppMamManager::archivedMessageReceived,
+            &m_helper, &QXmppMamTestHelper::archivedMessageReceived);
 
-    connect(&m_manager, SIGNAL(resultsRecieved(const QString&, const QXmppResultSetReply&, bool)),
-            &m_helper, SLOT(resultsRecieved(const QString&, const QXmppResultSetReply&, bool)));
+    connect(&m_manager, &QXmppMamManager::resultsRecieved,
+            &m_helper, &QXmppMamTestHelper::resultsRecieved);
 }
 
 void tst_QXmppMamManager::testHandleStanza_data()
@@ -101,7 +101,7 @@ void tst_QXmppMamManager::testHandleStanza_data()
                         "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
                         "<body>Call me but love, and I'll be new baptized; Henceforth I never will be Romeo.</body>"
                       "</message>")
-        << QString("f27");
+        << QStringLiteral("f27");
 
     QTest::newRow("stanza2")
         << QByteArray("<message id='aeb214' to='juliet@capulet.lit/chamber'>"

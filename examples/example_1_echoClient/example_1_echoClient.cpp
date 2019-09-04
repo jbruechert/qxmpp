@@ -48,7 +48,7 @@ void echoClient::messageReceived(const QXmppMessage& message)
     QString from = message.from();
     QString msg = message.body();
 
-    sendPacket(QXmppMessage("", from, "Your message: " + msg));
+    sendPacket(QXmppMessage(QLatin1String(""), from, "Your message: " + msg));
 }
 
 int main(int argc, char *argv[])
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     echoClient client;
     client.logger()->setLoggingType(QXmppLogger::StdoutLogging);
-    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    client.connectToServer(QStringLiteral("qxmpp.test1@qxmpp.org"), QStringLiteral("qxmpp123"));
 
     return app.exec();
 }

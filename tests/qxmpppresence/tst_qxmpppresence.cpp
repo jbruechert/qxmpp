@@ -276,9 +276,9 @@ void tst_QXmppPresence::testPresenceWithMix()
     QCOMPARE(presence.mixUserNick(), QString("thirdwitch"));
     serializePacket(presence, xml);
 
-    presence.setMixUserJid("alexander@example.org");
+    presence.setMixUserJid(QStringLiteral("alexander@example.org"));
     QCOMPARE(presence.mixUserJid(), QString("alexander@example.org"));
-    presence.setMixUserNick("erik");
+    presence.setMixUserNick(QStringLiteral("erik"));
     QCOMPARE(presence.mixUserNick(), QString("erik"));
 }
 

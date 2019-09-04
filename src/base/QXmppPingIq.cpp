@@ -33,15 +33,15 @@ QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
 
 bool QXmppPingIq::isPingIq(const QDomElement &element)
 {
-    QDomElement pingElement = element.firstChildElement("ping");
-    return (element.attribute("type") == "get" &&
+    QDomElement pingElement = element.firstChildElement(QStringLiteral("ping"));
+    return (element.attribute(QStringLiteral("type")) == QLatin1String("get") &&
             pingElement.namespaceURI() == ns_ping);
 }
 
 void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("ping");
-    writer->writeAttribute("xmlns", ns_ping);
+    writer->writeStartElement(QStringLiteral("ping"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_ping);
     writer->writeEndElement();
 }
 

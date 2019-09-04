@@ -68,7 +68,7 @@ void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
         QXmppIq iq(QXmppIq::Set);
         QXmppElement carbonselement;
         carbonselement.setTagName(m_carbonsEnabled ? "enable" : "disable");
-        carbonselement.setAttribute("xmlns", ns_carbons);
+        carbonselement.setAttribute(QStringLiteral("xmlns"), ns_carbons);
 
         iq.setExtensions(QXmppElementList() << carbonselement);
         client()->sendPacket(iq);
@@ -82,24 +82,24 @@ QStringList QXmppCarbonManager::discoveryFeatures() const
 
 bool QXmppCarbonManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() != "message")
+    if(element.tagName() != QLatin1String("message"))
         return false;
 
     bool sent = true;
-    QDomElement carbon = element.firstChildElement("sent");
+    QDomElement carbon = element.firstChildElement(QStringLiteral("sent"));
     if(carbon.isNull()) {
-        carbon = element.firstChildElement("received");
+        carbon = element.firstChildElement(QStringLiteral("received"));
         sent = false;
     }
 
     if(carbon.isNull() || carbon.namespaceURI() != ns_carbons)
         return false;   // Neither sent nor received -> no carbon message
 
-    QDomElement forwarded = carbon.firstChildElement("forwarded");
+    QDomElement forwarded = carbon.firstChildElement(QStringLiteral("forwarded"));
     if(forwarded.isNull())
         return false;
 
-    QDomElement messageelement = forwarded.firstChildElement("message");
+    QDomElement messageelement = forwarded.firstChildElement(QStringLiteral("message"));
     if(messageelement.isNull())
         return false;
 

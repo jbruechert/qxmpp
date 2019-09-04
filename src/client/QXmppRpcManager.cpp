@@ -147,8 +147,8 @@ QStringList QXmppRpcManager::discoveryFeatures() const
 QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const
 {
     QXmppDiscoveryIq::Identity identity;
-    identity.setCategory("automation");
-    identity.setType("rpc");
+    identity.setCategory(QStringLiteral("automation"));
+    identity.setType(QStringLiteral("rpc"));
     return QList<QXmppDiscoveryIq::Identity>() << identity;
 }
 

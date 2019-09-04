@@ -212,8 +212,8 @@ void tst_QXmppMixIq::testBase_data()
 
     QStringList emptyNodes;
     QStringList defaultNodes;
-    defaultNodes << "urn:xmpp:mix:nodes:messages" << "urn:xmpp:mix:nodes:presence"
-                 << "urn:xmpp:mix:nodes:participants" << "urn:xmpp:mix:nodes:info";
+    defaultNodes << QStringLiteral("urn:xmpp:mix:nodes:messages") << QStringLiteral("urn:xmpp:mix:nodes:presence")
+                 << QStringLiteral("urn:xmpp:mix:nodes:participants") << QStringLiteral("urn:xmpp:mix:nodes:info");
 
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<QXmppIq::Type>("type");
@@ -282,7 +282,7 @@ void tst_QXmppMixIq::testBase_data()
         << QXmppMixIq::UpdateSubscription
         << ""
         << ""
-        << (QStringList() << "urn:xmpp:mix:nodes:messages")
+        << (QStringList() << QStringLiteral("urn:xmpp:mix:nodes:messages"))
         << "";
     QTest::newRow("update-subscription-result")
         << updateSubscriptionResultXml
@@ -290,7 +290,7 @@ void tst_QXmppMixIq::testBase_data()
         << QXmppMixIq::UpdateSubscription
         << "hag66@shakespeare.example"
         << ""
-        << (QStringList() << "urn:xmpp:mix:nodes:messages")
+        << (QStringList() << QStringLiteral("urn:xmpp:mix:nodes:messages"))
         << "";
     QTest::newRow("setnick-set")
         << setNickSetXml
@@ -362,11 +362,11 @@ void tst_QXmppMixIq::testSetters()
     QXmppMixIq iq;
     iq.setActionType(QXmppMixIq::Join);
     QCOMPARE(iq.actionType(), QXmppMixIq::Join);
-    iq.setJid("interestingnews@mix.example.com");
+    iq.setJid(QStringLiteral("interestingnews@mix.example.com"));
     QCOMPARE(iq.jid(), QString("interestingnews@mix.example.com"));
-    iq.setChannelName("interestingnews");
+    iq.setChannelName(QStringLiteral("interestingnews"));
     QCOMPARE(iq.channelName(), QString("interestingnews"));
-    iq.setNodes(QStringList() << "com:example:mix:node:custom");
+    iq.setNodes(QStringList() << QStringLiteral("com:example:mix:node:custom"));
     QCOMPARE(iq.nodes(), QStringList() << "com:example:mix:node:custom");
     iq.setNick("SMUDO");
     QCOMPARE(iq.nick(), QString("SMUDO"));

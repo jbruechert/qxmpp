@@ -53,16 +53,16 @@ xmppClient::xmppClient(QObject *parent)
     addExtension(archiveManager);
 
     // connect signals
-    check = connect(this, SIGNAL(connected()),
-                    this, SLOT(clientConnected()));
+    check = connect(this, &QXmppClient::connected,
+                    this, &xmppClient::clientConnected);
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)),
-                    SLOT(archiveChatReceived(QXmppArchiveChat, QXmppResultSetReply)));
+    check = connect(archiveManager, &QXmppArchiveManager::archiveChatReceived,
+                    this, &xmppClient::archiveChatReceived);
     Q_ASSERT(check);
 
-    check = connect(archiveManager, SIGNAL(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)),
-                    SLOT(archiveListReceived(QList<QXmppArchiveChat>, QXmppResultSetReply)));
+    check = connect(archiveManager, &QXmppArchiveManager::archiveListReceived,
+                    this, &xmppClient::archiveListReceived);
     Q_ASSERT(check);
 
     // set limits
@@ -87,13 +87,13 @@ void xmppClient::setPageSize(int size)
 
 void xmppClient::clientConnected()
 {
-    logEnd("connected");
+    logEnd(QStringLiteral("connected"));
 
     // we want 0 results, i.e. only result-set management information (count)
-    logStart("fetching collection count");
+    logStart(QStringLiteral("fetching collection count"));
     QXmppResultSetQuery rsmQuery;
     rsmQuery.setMax(0);
-    archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
+    archiveManager->listCollections(QLatin1String(""), m_startDate, m_endDate, rsmQuery);
 }
 
 void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply)
@@ -103,16 +103,16 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
         m_collectionCount = rsmReply.count();
 
         // fetch first page
-        logStart("fetching collection first page");
+        logStart(QStringLiteral("fetching collection first page"));
         QXmppResultSetQuery rsmQuery;
         rsmQuery.setMax(m_pageSize);
         if (m_pageDirection == PageBackwards)
-            rsmQuery.setBefore("");
-        archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
+            rsmQuery.setBefore(QLatin1String(""));
+        archiveManager->listCollections(QLatin1String(""), m_startDate, m_endDate, rsmQuery);
     } else if (!chats.size()) {
-        logEnd("no items");
+        logEnd(QStringLiteral("no items"));
     } else {
-        logEnd(QString("items %1 to %2 of %3").arg(QString::number(rsmReply.index()), QString::number(rsmReply.index() + chats.size() - 1), QString::number(rsmReply.count())));
+        logEnd(QStringLiteral("items %1 to %2 of %3").arg(QString::number(rsmReply.index()), QString::number(rsmReply.index() + chats.size() - 1), QString::number(rsmReply.count())));
         foreach (const QXmppArchiveChat &chat, chats) {
             qDebug("chat start %s", qPrintable(chat.start().toString()));
             // NOTE: to actually retrieve conversations, uncomment this
@@ -123,20 +123,20 @@ void xmppClient::archiveListReceived(const QList<QXmppArchiveChat> &chats, const
             QXmppResultSetQuery rsmQuery;
             rsmQuery.setMax(m_pageSize);
             if (m_pageDirection == PageBackwards) {
-                logStart("fetching collection previous page");
+                logStart(QStringLiteral("fetching collection previous page"));
                 rsmQuery.setBefore(rsmReply.first());
             } else {
-                logStart("fetching collection next page");
+                logStart(QStringLiteral("fetching collection next page"));
                 rsmQuery.setAfter(rsmReply.last());
             }
-            archiveManager->listCollections("", m_startDate, m_endDate, rsmQuery);
+            archiveManager->listCollections(QLatin1String(""), m_startDate, m_endDate, rsmQuery);
         }
     }
 }
 
 void xmppClient::archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply)
 {
-    logEnd(QString("chat received, RSM count %1").arg(QString::number(rsmReply.count())));
+    logEnd(QStringLiteral("chat received, RSM count %1").arg(QString::number(rsmReply.count())));
     foreach (const QXmppArchiveMessage &msg, chat.messages()) {
         qDebug("example_7_archiveHandling : %s", qPrintable(msg.body()));
     }
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     xmppClient client;
     client.setPageSize(15);
     client.setPageDirection(xmppClient::PageBackwards);
-    client.connectToServer("qxmpp.test1@qxmpp.org", "qxmpp123");
+    client.connectToServer(QStringLiteral("qxmpp.test1@qxmpp.org"), QStringLiteral("qxmpp123"));
 
     return a.exec();
 }

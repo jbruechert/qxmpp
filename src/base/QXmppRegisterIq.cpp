@@ -101,40 +101,40 @@ void QXmppRegisterIq::setUsername(const QString &username)
 /// \cond
 bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 {
-    return (element.firstChildElement("query").namespaceURI() == ns_register);
+    return (element.firstChildElement(QStringLiteral("query")).namespaceURI() == ns_register);
 }
 
 void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_instructions = queryElement.firstChildElement("instructions").text();
-    m_username = queryElement.firstChildElement("username").text();
-    m_password = queryElement.firstChildElement("password").text();
-    m_email = queryElement.firstChildElement("email").text();
-    m_form.parse(queryElement.firstChildElement("x"));
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_instructions = queryElement.firstChildElement(QStringLiteral("instructions")).text();
+    m_username = queryElement.firstChildElement(QStringLiteral("username")).text();
+    m_password = queryElement.firstChildElement(QStringLiteral("password")).text();
+    m_email = queryElement.firstChildElement(QStringLiteral("email")).text();
+    m_form.parse(queryElement.firstChildElement(QStringLiteral("x")));
 }
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_register);
+    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_register);
     if (!m_instructions.isEmpty())
-        writer->writeTextElement("instructions", m_instructions);
+        writer->writeTextElement(QStringLiteral("instructions"), m_instructions);
 
     if (!m_username.isEmpty())
-        writer->writeTextElement("username", m_username);
+        writer->writeTextElement(QStringLiteral("username"), m_username);
     else if (!m_username.isNull())
-        writer->writeEmptyElement("username");
+        writer->writeEmptyElement(QStringLiteral("username"));
 
     if (!m_password.isEmpty())
-        writer->writeTextElement("password", m_password);
+        writer->writeTextElement(QStringLiteral("password"), m_password);
     else if (!m_password.isNull())
-        writer->writeEmptyElement("password");
+        writer->writeEmptyElement(QStringLiteral("password"));
 
     if (!m_email.isEmpty())
-        writer->writeTextElement("email", m_email);
+        writer->writeTextElement(QStringLiteral("email"), m_email);
     else if (!m_email.isNull())
-        writer->writeEmptyElement("email");
+        writer->writeEmptyElement(QStringLiteral("email"));
 
     m_form.toXml(writer);
     writer->writeEndElement();

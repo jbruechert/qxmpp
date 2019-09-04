@@ -204,9 +204,9 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     std::sort(sortedFeatures.begin(), sortedFeatures.end());
     sortedFeatures.removeDuplicates();
     foreach (const QXmppDiscoveryIq::Identity &identity, sortedIdentities)
-        S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
+        S += QStringLiteral("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
     foreach (const QString &feature, sortedFeatures)
-        S += feature + QLatin1String("<");
+        S += feature + QStringLiteral("<");
 
     if (!m_form.isNull()) {
         QMap<QString, QXmppDataForm::Field> fieldMap;
@@ -214,15 +214,15 @@ QByteArray QXmppDiscoveryIq::verificationString() const
             fieldMap.insert(field.key(), field);
         }
 
-        if (fieldMap.contains("FORM_TYPE")) {
-            const QXmppDataForm::Field field = fieldMap.take("FORM_TYPE");
-            S += field.value().toString() + QLatin1String("<");
+        if (fieldMap.contains(QStringLiteral("FORM_TYPE"))) {
+            const QXmppDataForm::Field field = fieldMap.take(QStringLiteral("FORM_TYPE"));
+            S += field.value().toString() + QStringLiteral("<");
 
             QStringList keys = fieldMap.keys();
             std::sort(keys.begin(), keys.end());
             foreach (const QString &key, keys) {
                 const QXmppDataForm::Field field = fieldMap.value(key);
-                S += key + QLatin1String("<");
+                S += key + QStringLiteral("<");
                 if (field.value().canConvert<QStringList>()) {
                     QStringList list = field.value().toStringList();
                     list.sort();
@@ -245,15 +245,15 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 /// \cond
 bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return (queryElement.namespaceURI() == ns_disco_info ||
             queryElement.namespaceURI() == ns_disco_items);
 }
 
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_queryNode = queryElement.attribute("node");
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_queryNode = queryElement.attribute(QStringLiteral("node"));
     if (queryElement.namespaceURI() == ns_disco_items)
         m_queryType = ItemsQuery;
     else
@@ -262,23 +262,23 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
     QDomElement itemElement = queryElement.firstChildElement();
     while (!itemElement.isNull())
     {
-        if (itemElement.tagName() == "feature")
+        if (itemElement.tagName() == QLatin1String("feature"))
         {
-            m_features.append(itemElement.attribute("var"));
+            m_features.append(itemElement.attribute(QStringLiteral("var")));
         }
-        else if (itemElement.tagName() == "identity")
+        else if (itemElement.tagName() == QLatin1String("identity"))
         {
             QXmppDiscoveryIq::Identity identity;
-            identity.setLanguage(itemElement.attribute("xml:lang"));
-            identity.setCategory(itemElement.attribute("category"));
-            identity.setName(itemElement.attribute("name"));
-            identity.setType(itemElement.attribute("type"));
+            identity.setLanguage(itemElement.attribute(QStringLiteral("xml:lang")));
+            identity.setCategory(itemElement.attribute(QStringLiteral("category")));
+            identity.setName(itemElement.attribute(QStringLiteral("name")));
+            identity.setType(itemElement.attribute(QStringLiteral("type")));
 
             // FIXME: for some reason the language does not found,
             // so we are forced to use QDomNamedNodeMap
             QDomNamedNodeMap m(itemElement.attributes());
             for (int i = 0; i < m.size(); ++i) {
-                if (m.item(i).nodeName() == "xml:lang") {
+                if (m.item(i).nodeName() == QLatin1String("xml:lang")) {
                     identity.setLanguage(m.item(i).nodeValue());
                     break;
                 }
@@ -286,15 +286,15 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 
             m_identities.append(identity);
         }
-        else if (itemElement.tagName() == "item")
+        else if (itemElement.tagName() == QLatin1String("item"))
         {
             QXmppDiscoveryIq::Item item;
-            item.setJid(itemElement.attribute("jid"));
-            item.setName(itemElement.attribute("name"));
-            item.setNode(itemElement.attribute("node"));
+            item.setJid(itemElement.attribute(QStringLiteral("jid")));
+            item.setName(itemElement.attribute(QStringLiteral("name")));
+            item.setNode(itemElement.attribute(QStringLiteral("node")));
             m_items.append(item);
         }
-        else if (itemElement.tagName() == "x" &&
+        else if (itemElement.tagName() == QLatin1String("x") &&
                  itemElement.namespaceURI() == ns_data)
         {
             m_form.parse(itemElement);
@@ -305,32 +305,32 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns",
+    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeAttribute(QStringLiteral("xmlns"),
         m_queryType == InfoQuery ? ns_disco_info : ns_disco_items);
-    helperToXmlAddAttribute(writer, "node", m_queryNode);
+    helperToXmlAddAttribute(writer, QStringLiteral("node"), m_queryNode);
 
     if (m_queryType == InfoQuery) {
         foreach (const QXmppDiscoveryIq::Identity& identity, m_identities) {
-            writer->writeStartElement("identity");
-            helperToXmlAddAttribute(writer, "xml:lang", identity.language());
-            helperToXmlAddAttribute(writer, "category", identity.category());
-            helperToXmlAddAttribute(writer, "name", identity.name());
-            helperToXmlAddAttribute(writer, "type", identity.type());
+            writer->writeStartElement(QStringLiteral("identity"));
+            helperToXmlAddAttribute(writer, QStringLiteral("xml:lang"), identity.language());
+            helperToXmlAddAttribute(writer, QStringLiteral("category"), identity.category());
+            helperToXmlAddAttribute(writer, QStringLiteral("name"), identity.name());
+            helperToXmlAddAttribute(writer, QStringLiteral("type"), identity.type());
             writer->writeEndElement();
         }
 
         foreach (const QString &feature, m_features) {
-            writer->writeStartElement("feature");
-            helperToXmlAddAttribute(writer, "var", feature);
+            writer->writeStartElement(QStringLiteral("feature"));
+            helperToXmlAddAttribute(writer, QStringLiteral("var"), feature);
             writer->writeEndElement();
         }
     } else {
         foreach (const QXmppDiscoveryIq::Item& item, m_items) {
-            writer->writeStartElement("item");
-            helperToXmlAddAttribute(writer, "jid", item.jid());
-            helperToXmlAddAttribute(writer, "name", item.name());
-            helperToXmlAddAttribute(writer, "node", item.node());
+            writer->writeStartElement(QStringLiteral("item"));
+            helperToXmlAddAttribute(writer, QStringLiteral("jid"), item.jid());
+            helperToXmlAddAttribute(writer, QStringLiteral("name"), item.name());
+            helperToXmlAddAttribute(writer, QStringLiteral("node"), item.node());
             writer->writeEndElement();
         }
     }

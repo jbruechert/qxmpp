@@ -77,31 +77,31 @@ void QXmppNonSASLAuthIq::setResource(const QString &resource)
 /// \cond
 bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
     return queryElement.namespaceURI() == ns_auth;
 }
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_username = queryElement.firstChildElement("username").text();
-    m_password = queryElement.firstChildElement("password").text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement("digest").text().toLatin1());
-    m_resource = queryElement.firstChildElement("resource").text();
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_username = queryElement.firstChildElement(QStringLiteral("username")).text();
+    m_password = queryElement.firstChildElement(QStringLiteral("password")).text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement(QStringLiteral("digest")).text().toLatin1());
+    m_resource = queryElement.firstChildElement(QStringLiteral("resource")).text();
 }
 
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QStringLiteral("query"));
     writer->writeAttribute("xmlns", ns_auth);
     if (!m_username.isEmpty())
-        writer->writeTextElement("username", m_username);
+        writer->writeTextElement(QStringLiteral("username"), m_username);
     if (!m_digest.isEmpty())
-        writer->writeTextElement("digest", m_digest.toHex());
+        writer->writeTextElement(QStringLiteral("digest"), m_digest.toHex());
     if (!m_password.isEmpty())
-        writer->writeTextElement("password", m_password);
+        writer->writeTextElement(QStringLiteral("password"), m_password);
     if (!m_resource.isEmpty())
-        writer->writeTextElement("resource", m_resource);
+        writer->writeTextElement(QStringLiteral("resource"), m_resource);
     writer->writeEndElement();
 }
 /// \endcond

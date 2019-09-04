@@ -47,7 +47,7 @@ QStringList QXmppMessageReceiptManager::discoveryFeatures() const
 
 bool QXmppMessageReceiptManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() != "message")
+    if (stanza.tagName() != QLatin1String("message"))
         return false;
 
     QXmppMessage message;

@@ -89,8 +89,8 @@ void QXmppMamQueryIq::setQueryId(const QString &id)
 /// \cond
 bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement queryElement = element.firstChildElement("query");
+    if (element.tagName() == QLatin1String("iq")) {
+        QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
         if (!queryElement.isNull() && queryElement.namespaceURI() == ns_mam) {
             return true;
         }
@@ -100,14 +100,14 @@ bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 
 void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement("query");
-    m_node = queryElement.attribute("node");
-    m_queryId = queryElement.attribute("queryId");
-    QDomElement resultSetElement = queryElement.firstChildElement("set");
+    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    m_node = queryElement.attribute(QStringLiteral("node"));
+    m_queryId = queryElement.attribute(QStringLiteral("queryId"));
+    QDomElement resultSetElement = queryElement.firstChildElement(QStringLiteral("set"));
     if (!resultSetElement.isNull()) {
         m_resultSetQuery.parse(resultSetElement);
     }
-    QDomElement formElement = queryElement.firstChildElement("x");
+    QDomElement formElement = queryElement.firstChildElement(QStringLiteral("x"));
     if (!formElement.isNull()) {
         m_form.parse(formElement);
     }
@@ -115,13 +115,13 @@ void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
-    writer->writeAttribute("xmlns", ns_mam);
+    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_mam);
     if (!m_node.isEmpty()) {
-        writer->writeAttribute("node", m_node);
+        writer->writeAttribute(QStringLiteral("node"), m_node);
     }
     if (!m_queryId.isEmpty()) {
-        writer->writeAttribute("queryid", m_queryId);
+        writer->writeAttribute(QStringLiteral("queryid"), m_queryId);
     }
     m_form.toXml(writer);
     m_resultSetQuery.toXml(writer);
@@ -163,8 +163,8 @@ void QXmppMamResultIq::setComplete(bool complete)
 /// \cond
 bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
-        QDomElement finElement = element.firstChildElement("fin");
+    if (element.tagName() == QLatin1String("iq")) {
+        QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
         if (!finElement.isNull() && finElement.namespaceURI() == ns_mam) {
             return true;
         }
@@ -174,9 +174,9 @@ bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 
 void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement finElement = element.firstChildElement("fin");
-    m_complete = finElement.attribute("complete") == QString("true");
-    QDomElement resultSetElement = finElement.firstChildElement("set");
+    QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
+    m_complete = finElement.attribute(QStringLiteral("complete")) == QStringLiteral("true");
+    QDomElement resultSetElement = finElement.firstChildElement(QStringLiteral("set"));
     if (!resultSetElement.isNull()) {
         m_resultSetReply.parse(resultSetElement);
     }
@@ -184,10 +184,10 @@ void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("fin");
-    writer->writeAttribute("xmlns", ns_mam);
+    writer->writeStartElement(QStringLiteral("fin"));
+    writer->writeAttribute(QStringLiteral("xmlns"), ns_mam);
     if (m_complete) {
-        writer->writeAttribute("complete", "true");
+        writer->writeAttribute(QStringLiteral("complete"), QStringLiteral("true"));
     }
     m_resultSetReply.toXml(writer);
     writer->writeEndElement();

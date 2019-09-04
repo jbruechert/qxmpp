@@ -138,7 +138,7 @@ void QXmppCallPrivate::handleAck(const QXmppIq &ack)
         if (id == requests[i].id()) {
             // process acknowledgement
             const QXmppJingleIq request = requests.takeAt(i);
-            q->debug(QString("Received ACK for packet %1").arg(id));
+            q->debug(QStringLiteral("Received ACK for packet %1").arg(id));
 
             // handle termination
             if (request.action() == QXmppJingleIq::SessionTerminate)
@@ -152,7 +152,7 @@ bool QXmppCallPrivate::handleDescription(QXmppCallPrivate::Stream *stream, const
 {
     stream->channel->setRemotePayloadTypes(content.payloadTypes());
     if (!(stream->channel->openMode() & QIODevice::ReadWrite)) {
-        q->warning(QString("Remote party %1 did not provide any known %2 payloads for call %3").arg(jid, stream->media, sid));
+        q->warning(QStringLiteral("Remote party %1 did not provide any known %2 payloads for call %3").arg(jid, stream->media, sid));
         return false;
     }
     q->updateOpenMode();
@@ -179,7 +179,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
     if (iq.action() == QXmppJingleIq::SessionAccept) {
 
         if (direction == QXmppCall::IncomingDirection) {
-            q->warning("Ignoring Session-Accept for an incoming call");
+            q->warning(QStringLiteral("Ignoring Session-Accept for an incoming call"));
             return;
         }
 
@@ -203,7 +203,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
         // notify user
-        QTimer::singleShot(0, q, SIGNAL(ringing()));
+        QTimer::singleShot(0, q, &QXmppCall::ringing);
 
     } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
 
@@ -211,7 +211,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // terminate
-        q->info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
+        q->info(QStringLiteral("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
         q->terminated();
 
     } else if (iq.action() == QXmppJingleIq::ContentAccept) {
@@ -307,7 +307,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
         stream->channel = videoChannel;
         channelObject = videoChannel;
     } else {
-        q->warning(QString("Unsupported media type %1").arg(media));
+        q->warning(QStringLiteral("Unsupported media type %1").arg(media));
         delete stream;
         return nullptr;
     }
@@ -324,20 +324,20 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::createStream(const QString &media)
     stream->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    check = QObject::connect(stream->connection, SIGNAL(localCandidatesChanged()),
-        q, SLOT(localCandidatesChanged()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::localCandidatesChanged,
+        q, &QXmppCall::localCandidatesChanged);
     Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, SIGNAL(connected()),
-        q, SLOT(updateOpenMode()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::connected,
+        q, &QXmppCall::updateOpenMode);
     Q_ASSERT(check);
 
-    check = QObject::connect(q, SIGNAL(stateChanged(QXmppCall::State)),
-        q, SLOT(updateOpenMode()));
+    check = QObject::connect(q, &QXmppCall::stateChanged,
+        q, &QXmppCall::updateOpenMode);
     Q_ASSERT(check);
 
-    check = QObject::connect(stream->connection, SIGNAL(disconnected()),
-        q, SLOT(hangup()));
+    check = QObject::connect(stream->connection, &QXmppIceConnection::disconnected,
+        q, &QXmppCall::hangup);
     Q_ASSERT(check);
 
     if (channelObject) {
@@ -359,7 +359,7 @@ QXmppJingleIq::Content QXmppCallPrivate::localContent(QXmppCallPrivate::Stream *
     QXmppJingleIq::Content content;
     content.setCreator(stream->creator);
     content.setName(stream->name);
-    content.setSenders("both");
+    content.setSenders(QStringLiteral("both"));
 
     // description
     content.setDescriptionMedia(stream->media);
@@ -444,7 +444,7 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     setState(QXmppCall::DisconnectingState);
 
     // schedule forceful termination in 5s
-    QTimer::singleShot(5000, q, SLOT(terminated()));
+    QTimer::singleShot(5000, q, &QXmppCall::terminated);
 }
 
 QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent)
@@ -458,8 +458,8 @@ QXmppCall::QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCa
 
     // create audio stream
     QXmppCallPrivate::Stream *stream = d->createStream(AUDIO_MEDIA);
-    stream->creator = QLatin1String("initiator");
-    stream->name = QLatin1String("voice");
+    stream->creator = QStringLiteral("initiator");
+    stream->name = QStringLiteral("voice");
     d->streams << stream;
 }
 
@@ -652,7 +652,7 @@ QXmppCall::State QXmppCall::state() const
 void QXmppCall::startVideo()
 {
     if (d->state != QXmppCall::ActiveState) {
-        warning("Cannot start video, call is not active");
+        warning(QStringLiteral("Cannot start video, call is not active"));
         return;
     }
 
@@ -665,8 +665,8 @@ void QXmppCall::startVideo()
 
     // create video stream
     stream = d->createStream(VIDEO_MEDIA);
-    stream->creator = (d->direction == QXmppCall::OutgoingDirection) ? QLatin1String("initiator") : QLatin1String("responder");
-    stream->name = QLatin1String("webcam");
+    stream->creator = (d->direction == QXmppCall::OutgoingDirection) ? QStringLiteral("initiator") : QStringLiteral("responder");
+    stream->name = QStringLiteral("webcam");
     d->streams << stream;
 
     // build request
@@ -744,7 +744,7 @@ QStringList QXmppCallManager::discoveryFeatures() const
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
 {
-    if(element.tagName() == "iq")
+    if(element.tagName() == QLatin1String("iq"))
     {
         // XEP-0166: Jingle
         if (QXmppJingleIq::isJingleIq(element))
@@ -766,16 +766,16 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
     QXmppClientExtension::setClient(client);
 
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
+    check = connect(client, &QXmppClient::disconnected,
+                    this, &QXmppCallManager::_q_disconnected);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(iqReceived(QXmppIq)),
-                    this, SLOT(_q_iqReceived(QXmppIq)));
+    check = connect(client, &QXmppClient::iqReceived,
+                    this, &QXmppCallManager::_q_iqReceived);
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    check = connect(client, &QXmppClient::presenceReceived,
+                    this, &QXmppCallManager::_q_presenceReceived);
     Q_ASSERT(check);
 }
 /// \endcond
@@ -790,12 +790,12 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
     Q_UNUSED(check);
 
     if (jid.isEmpty()) {
-        warning("Refusing to call an empty jid");
+        warning(QStringLiteral("Refusing to call an empty jid"));
         return nullptr;
     }
 
     if (jid == client()->configuration().jid()) {
-        warning("Refusing to call self");
+        warning(QStringLiteral("Refusing to call self"));
         return nullptr;
     }
 
@@ -804,8 +804,8 @@ QXmppCall *QXmppCallManager::call(const QString &jid)
 
     // register call
     d->calls << call;
-    check = connect(call, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(_q_callDestroyed(QObject*)));
+    check = connect(call, &QObject::destroyed,
+                    this, &QXmppCallManager::_q_callDestroyed);
     Q_ASSERT(check);
     emit callStarted(call);
 
@@ -923,8 +923,8 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
 
         // register call
         d->calls << call;
-        check = connect(call, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(_q_callDestroyed(QObject*)));
+        check = connect(call, &QObject::destroyed,
+                        this, &QXmppCallManager::_q_callDestroyed);
         Q_ASSERT(check);
 
         // send ringing indication
