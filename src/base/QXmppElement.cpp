@@ -88,7 +88,7 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
 
 QXmppElementPrivate::~QXmppElementPrivate()
 {
-    for (auto *child : children)
+    for (auto *child : qAsConst(children))
         if (!child->counter.deref())
             delete child;
 }
@@ -178,7 +178,7 @@ void QXmppElement::appendChild(const QXmppElement &child)
 
 QXmppElement QXmppElement::firstChildElement(const QString &name) const
 {
-    for (auto *child_d : d->children)
+    for (auto *child_d : qAsConst(d->children))
         if (name.isEmpty() || child_d->name == name)
             return QXmppElement(child_d);
     return QXmppElement();
@@ -243,7 +243,7 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
             helperToXmlAddAttribute(writer, attr, d->attributes.value(attr));
     if (!d->value.isEmpty())
         writer->writeCharacters(d->value);
-    for (auto *childPrivate : d->children)
+    for (auto *childPrivate : qAsConst(d->children))
         QXmppElement(childPrivate).toXml(writer);
     writer->writeEndElement();
 }

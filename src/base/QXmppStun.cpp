@@ -1248,7 +1248,7 @@ void QXmppTurnAllocation::disconnectFromHost()
 
     // clear channels and any outstanding transactions
     m_channels.clear();
-    for (auto *transaction : m_transactions)
+    for (auto *transaction : qAsConst(m_transactions))
         delete transaction;
     m_transactions.clear();
 
@@ -1318,7 +1318,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
     QXmppStunMessage message;
     QStringList errors;
     if (!message.decode(buffer, QByteArray(), &errors)) {
-        for (const auto &error : errors)
+        for (const auto &error : qAsConst(errors))
             warning(error);
         return;
     }
@@ -1331,7 +1331,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
 #endif
 
     // find transaction
-    for (auto *transaction : m_transactions) {
+    for (auto *transaction : qAsConst(m_transactions)) {
         if (transaction->request().id() == message.id() &&
             transaction->request().messageMethod() == message.messageMethod()) {
             transaction->readStun(message);
@@ -1814,12 +1814,12 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         candidate.host().protocol() != QAbstractSocket::IPv6Protocol))
         return false;
 
-    for (const auto &c : remoteCandidates)
+    for (const auto &c : qAsConst(remoteCandidates))
         if (c.host() == candidate.host() && c.port() == candidate.port())
             return false;
     remoteCandidates << candidate;
 
-    for (auto *transport : transports) {
+    for (auto *transport : qAsConst(transports)) {
         // only pair compatible addresses
         const QXmppJingleCandidate local = transport->localCandidate(component);
         if (!isCompatibleAddress(local.host(), candidate.host()))
@@ -1841,7 +1841,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
 
 CandidatePair* QXmppIceComponentPrivate::findPair(QXmppStunTransaction *transaction)
 {
-    for (auto *pair : pairs) {
+    for (auto *pair : qAsConst(pairs)) {
         if (pair->transaction == transaction)
             return pair;
     }
@@ -1874,7 +1874,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
     // clear previous candidates and sockets
     localCandidates.clear();
     qDeleteAll(pairs);
-    for (auto *transport : transports)
+    for (auto *transport : qAsConst(transports))
         if (transport != turnAllocation)
             delete transport;
     transports.clear();
@@ -1900,7 +1900,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket*> sockets)
 
         QXmppStunMessage request;
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-        for (auto *transport : transports) {
+        for (auto *transport : qAsConst(transports)) {
             const QXmppJingleCandidate local = transport->localCandidate(component);
             if (!isCompatibleAddress(local.host(), config->stunHost))
                 continue;
@@ -2010,7 +2010,7 @@ void QXmppIceComponent::checkCandidates()
         return;
     debug("Checking remote candidates");
 
-    for (auto *pair : d->pairs) {
+    for (auto *pair : qAsConst(d->pairs)) {
         if (pair->state() == CandidatePair::WaitingState) {
             d->performCheck(pair, d->config->iceControlling);
             break;
@@ -2022,7 +2022,7 @@ void QXmppIceComponent::checkCandidates()
 
 void QXmppIceComponent::close()
 {
-    for (auto *transport : d->transports)
+    for (auto *transport : qAsConst(d->transports))
         transport->disconnectFromHost();
     d->turnAllocation->disconnectFromHost();
     d->timer->stop();
@@ -2067,7 +2067,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     if (!messageType || messageCookie != STUN_MAGIC)
     {
         // use this as an opportunity to flag a potential pair
-        for (auto *pair : d->pairs) {
+        for (auto *pair : qAsConst(d->pairs)) {
             if (pair->remote.host() == remoteHost &&
                 pair->remote.port() == remotePort) {
                 d->fallbackPair = pair;
@@ -2100,7 +2100,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
     QXmppStunMessage message;
     QStringList errors;
     if (!message.decode(buffer, messagePassword.toUtf8(), &errors)) {
-        for (const auto &error : errors)
+        for (const auto &error : qAsConst(errors))
             warning(error);
         return;
     }
@@ -2145,7 +2145,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         // find or create remote candidate
         QXmppJingleCandidate remoteCandidate;
         bool remoteCandidateFound = false;
-        for (const auto &c : d->remoteCandidates) {
+        for (const auto &c : qAsConst(d->remoteCandidates)) {
             if (c.host() == remoteHost && c.port() == remotePort) {
                 remoteCandidate = c;
                 remoteCandidateFound = true;
@@ -2167,7 +2167,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         }
 
         // construct pair
-        for (auto *ptr : d->pairs) {
+        for (auto *ptr : qAsConst(d->pairs)) {
             if (ptr->transport == transport
              && ptr->remote.host() == remoteHost
              && ptr->remote.port() == remotePort) {
@@ -2206,7 +2206,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
             || message.messageClass() == QXmppStunMessage::Error) {
 
         // find the pair for this transaction
-        for (auto *ptr : d->pairs) {
+        for (auto *ptr : qAsConst(d->pairs)) {
             if (ptr->transaction && ptr->transaction->request().id() == message.id()) {
                 pair = ptr;
                 break;
@@ -2294,7 +2294,7 @@ void QXmppIceComponent::transactionFinished()
             }
 
             // check whether this candidates is already known
-            for (const auto &candidate : d->localCandidates) {
+            for (const auto &candidate : qAsConst(d->localCandidates)) {
                 if (candidate.host() == reflexiveHost &&
                     candidate.port() == reflexivePort &&
                     candidate.type() == QXmppJingleCandidate::ServerReflexiveType)
@@ -2616,7 +2616,7 @@ bool QXmppIceConnection::bind(const QList<QHostAddress> &addresses)
     QList<int> keys = d->components.keys();
     std::sort(keys.begin(), keys.end());
     int s = 0;
-    for (const auto k : keys) {
+    for (const auto k : qAsConst(keys)) {
         d->components[k]->d->setSockets(sockets.mid(s, addresses.size()));
         s += addresses.size();
     }

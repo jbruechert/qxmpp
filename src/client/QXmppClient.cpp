@@ -503,7 +503,7 @@ QXmppVersionManager& QXmppClient::versionManager()
 
 void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 {
-    for (auto *extension : d->extensions) {
+    for (auto *extension : qAsConst(d->extensions)) {
         if (extension->handleStanza(element)) {
             handled = true;
             return;

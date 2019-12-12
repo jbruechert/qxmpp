@@ -220,7 +220,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 
             QStringList keys = fieldMap.keys();
             std::sort(keys.begin(), keys.end());
-            for (const auto &key : keys) {
+            for (const auto &key : qAsConst(keys)) {
                 const QXmppDataForm::Field field = fieldMap.value(key);
                 S += key + QLatin1String("<");
                 if (field.value().canConvert<QStringList>()) {

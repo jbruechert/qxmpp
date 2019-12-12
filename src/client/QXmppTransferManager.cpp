@@ -758,7 +758,7 @@ QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *q
 
 QXmppTransferJob* QXmppTransferManagerPrivate::getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id)
 {
-    for (auto *job : jobs) {
+    for (auto *job : qAsConst(jobs)) {
         if (job->d->direction == direction &&
             job->d->jid == jid &&
             job->d->requestId == id)
@@ -774,7 +774,7 @@ QXmppTransferIncomingJob *QXmppTransferManagerPrivate::getIncomingJobByRequestId
 
 QXmppTransferIncomingJob* QXmppTransferManagerPrivate::getIncomingJobBySid(const QString &jid, const QString &sid)
 {
-    for (auto *job : jobs) {
+    for (auto *job : qAsConst(jobs)) {
         if (job->d->direction == QXmppTransferJob::IncomingDirection &&
             job->d->jid == jid &&
             job->d->sid == sid)
@@ -816,7 +816,7 @@ QXmppTransferManager::~QXmppTransferManager()
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 {
     // handle IQ from proxy
-    for (auto *job : d->jobs) {
+    for (auto *job : qAsConst(d->jobs)) {
         if (job->d->socksProxy.jid() == iq.from() && job->d->requestId == iq.id()) {
             if (iq.type() == QXmppIq::Result && iq.streamHosts().size() > 0) {
                 job->d->socksProxy = iq.streamHosts().first();
@@ -1137,7 +1137,7 @@ void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
     bool check;
     Q_UNUSED(check);
 
-    for (auto *ptr : d->jobs) {
+    for (auto *ptr : qAsConst(d->jobs)) {
         // handle IQ from proxy
         if (ptr->direction() == QXmppTransferJob::OutgoingDirection && ptr->d->socksProxy.jid() == iq.from() && ptr->d->requestId == iq.id()) {
             auto *job = static_cast<QXmppTransferOutgoingJob*>(ptr);
@@ -1423,7 +1423,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 void QXmppTransferManager::_q_socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
     const QString ownJid = client()->configuration().jid();
-    for (auto *job : d->jobs) {
+    for (auto *job : qAsConst(d->jobs)) {
         if (hostName == streamHash(job->d->sid, ownJid, job->jid()) && port == 0) {
             job->d->socksSocket = socket;
             return;

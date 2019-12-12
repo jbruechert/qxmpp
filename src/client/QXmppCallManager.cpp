@@ -117,7 +117,7 @@ QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &media)
 {
-    for (auto *stream : streams)
+    for (auto *stream : qAsConst(streams))
         if (stream->media == media)
             return stream;
     return nullptr;
@@ -125,7 +125,7 @@ QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByMedia(const QString &med
 
 QXmppCallPrivate::Stream *QXmppCallPrivate::findStreamByName(const QString &name)
 {
-    for (auto *stream : streams)
+    for (auto *stream : qAsConst(streams))
         if (stream->name == name)
             return stream;
     return nullptr;
@@ -542,7 +542,7 @@ QIODevice::OpenMode QXmppCall::videoMode() const
 void QXmppCall::terminated()
 {
     // close streams
-    for (auto *stream : d->streams) {
+    for (auto *stream : qAsConst(d->streams)) {
         stream->channel->close();
         stream->connection->close();
     }
@@ -575,7 +575,7 @@ void QXmppCall::localCandidatesChanged()
     // find the stream
     auto *conn = qobject_cast<QXmppIceConnection*>(sender());
     QXmppCallPrivate::Stream *stream = nullptr;
-    for (auto *ptr : d->streams) {
+    for (auto *ptr : qAsConst(d->streams)) {
         if (ptr->connection == conn) {
             stream = ptr;
             break;
@@ -866,7 +866,7 @@ void QXmppCallManager::_q_callDestroyed(QObject *object)
 
 void QXmppCallManager::_q_disconnected()
 {
-    for (auto *call : d->calls)
+    for (auto *call : qAsConst(d->calls))
         call->d->terminate(QXmppJingleIq::Reason::Gone);
 }
 
@@ -879,7 +879,7 @@ void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
         return;
 
     // find request
-    for (auto *call : d->calls)
+    for (auto *call : qAsConst(d->calls))
         call->d->handleAck(ack);
 }
 
@@ -959,7 +959,7 @@ void QXmppCallManager::_q_presenceReceived(const QXmppPresence &presence)
     if (presence.type() != QXmppPresence::Unavailable)
         return;
 
-    for (auto *call : d->calls) {
+    for (auto *call : qAsConst(d->calls)) {
         if (presence.from() == call->jid()) {
             // the remote party has gone away, terminate call
             call->d->terminate(QXmppJingleIq::Reason::Gone);

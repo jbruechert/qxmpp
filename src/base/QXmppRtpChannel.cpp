@@ -352,7 +352,7 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     QXmppCodec *codec = nullptr;
     const quint8 packetType = packet.type();
     if (!d->incomingCodecs.contains(packetType)) {
-        for (const auto &payload : m_incomingPayloadTypes) {
+        for (const auto &payload : qAsConst(m_incomingPayloadTypes)) {
             if (packetType == payload.id()) {
                 codec = d->codecForPayloadType(payload);
                 break;
@@ -499,7 +499,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
     }
 
     // create outgoing codec
-    for (const auto &outgoingType : m_outgoingPayloadTypes) {
+    for (const auto &outgoingType : qAsConst(m_outgoingPayloadTypes)) {
         // check for telephony events
         if (outgoingType.name() == "telephone-event") {
             d->outgoingTonesType = outgoingType;
@@ -944,7 +944,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
         delete d->encoder;
         d->encoder = nullptr;
     }
-    for (const auto &payload : m_outgoingPayloadTypes) {
+    for (const auto &payload : qAsConst(m_outgoingPayloadTypes)) {
         QXmppVideoEncoder *encoder = nullptr;
         if (false)
             {}

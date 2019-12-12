@@ -146,7 +146,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         }
 
         // send data
-        for (auto *conn : found)
+        for (auto *conn : qAsConst(found))
             QMetaObject::invokeMethod(conn, "sendData", Q_ARG(QByteArray, data));
         return !found.isEmpty();
 
@@ -283,7 +283,7 @@ void QXmppServerPrivate::loadExtensions(QXmppServer *server)
 void QXmppServerPrivate::startExtensions()
 {
     if (!started) {
-        for (auto *extension : extensions)
+        for (auto *extension : qAsConst(extensions))
             if (!extension->start())
                 warning(QString("Could not start extension %1").arg(extension->extensionName()));
         started = true;
@@ -590,9 +590,9 @@ void QXmppServer::close()
     QSetIterator<QXmppIncomingClient*> itr(d->incomingClients);
     while (itr.hasNext())
         itr.next()->disconnectFromHost();
-    for (auto *stream : d->incomingServers)
+    for (auto *stream : qAsConst(d->incomingServers))
        stream->disconnectFromHost();
-    for (auto *stream : d->outgoingServers)
+    for (auto *stream : qAsConst(d->outgoingServers))
        stream->disconnectFromHost();
 }
 
