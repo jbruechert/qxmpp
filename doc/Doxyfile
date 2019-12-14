@@ -1,0 +1,21 @@
+PROJECT_NAME           = "QXmpp"
+PROJECT_NUMBER         = Version:1.2.0
+INPUT                  = /home/jbb/kde/src/qxmpp/doc/index.doc \
+                         /home/jbb/kde/src/qxmpp/doc/using.doc \
+                         /home/jbb/kde/src/qxmpp/doc/xep.doc \
+                         /home/jbb/kde/src/qxmpp/src
+
+ALPHABETICAL_INDEX     = NO
+EXCLUDE_PATTERNS       = */moc_* */mod_* */*_p.h */QXmppCodec.cpp */QXmppSasl.cpp
+FULL_PATH_NAMES        = NO
+HIDE_UNDOC_CLASSES     = YES
+GENERATE_LATEX         = NO
+HTML_TIMESTAMP         = NO
+QUIET                  = YES
+RECURSIVE              = YES
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = "QXMPP_DEPRECATED_SINCE(major, minor)=1" "QT_DEPRECATED_X(msg)="
+GENERATE_XML           = YES
+STRIP_FROM_PATH        = ".."
