@@ -29,6 +29,7 @@
 #include <gst/gst.h>
 
 #include <QObject>
+#include <QIODevice>
 
 class QXmppCallStreamPrivate;
 class QXmppIceConnection;
@@ -61,6 +62,24 @@ private:
 
     friend class QXmppCall;
     friend class QXmppCallPrivate;
+};
+
+class QXMPP_EXPORT QXmppCallStreamDevice : public QIODevice
+{
+    Q_OBJECT
+
+public:
+    explicit QXmppCallStreamDevice(QXmppCallStream *stream);
+
+    // QIODevice functions
+    qint64 readData(char *data, qint64 maxlen) override;
+    qint64 writeData(const char *data, qint64 len) override;
+
+    static GstPad *m_receivingPad;
+    static GstPad *m_sendingPad;
+
+private:
+    QXmppCallStream *m_stream;
 };
 
 #endif

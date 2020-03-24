@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2020 The QXmpp developers
  *
  * Author:
@@ -358,4 +358,60 @@ void QXmppCallStream::setSendPadCallback(void (*cb)(GstPad *))
     if (d->sendPad) {
         d->sendPadCB(d->sendPad);
     }
+}
+
+qint64 QXmppCallStreamDevice::readData(char *data, qint64 maxlen)
+{
+    // receiving pad might not yet exist
+    if (m_receivingPad) {
+        auto *buffer = gst_buffer_new();
+        GstFlowReturn ret = gst_pad_pull_range(m_receivingPad, 0, maxlen, &buffer);
+
+        GstMapInfo mapInfo;
+        if (!gst_buffer_map(buffer, &mapInfo, GST_MAP_WRITE)) {
+            qFatal("Could not map buffer");
+            return 0;
+        }
+        std::memcpy(mapInfo.data, data, mapInfo.size);
+        gst_buffer_unmap(buffer, &mapInfo);
+
+        if (ret == GST_FLOW_OK) {
+            return maxlen;
+        }
+    }
+
+    return 0;
+}
+
+qint64 QXmppCallStreamDevice::writeData(const char *data, qint64 len)
+{
+    if (m_sendingPad) {
+        auto *gbytes = g_bytes_new(data, len);
+        auto *buffer = gst_buffer_new_wrapped_bytes(gbytes);
+        GstFlowReturn ret = gst_pad_push(m_sendingPad, buffer);
+
+        if (ret == GST_FLOW_OK) {
+            return len;
+        }
+    }
+
+    return 0;
+}
+
+GstPad *QXmppCallStreamDevice::m_receivingPad;
+GstPad *QXmppCallStreamDevice::m_sendingPad;
+
+static void sendPad(GstPad *pad) {
+    QXmppCallStreamDevice::m_sendingPad = pad;
+}
+
+static void receivePad(GstPad *pad) {
+    QXmppCallStreamDevice::m_receivingPad = pad;
+}
+
+QXmppCallStreamDevice::QXmppCallStreamDevice(QXmppCallStream *stream)
+{
+    m_stream = stream;
+    m_stream->setSendPadCallback(&sendPad);
+    m_stream->setReceivePadCallback(&receivePad);
 }
