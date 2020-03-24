@@ -457,13 +457,10 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
     stream->d->connection->bind(QXmppIceComponent::discoverAddresses());
 
     // connect signals
-    check = QObject::connect(stream->d->connection, SIGNAL(localCandidatesChanged()),
-                             q, SLOT(localCandidatesChanged()));
-    Q_ASSERT(check);
-
-    check = QObject::connect(stream->d->connection, SIGNAL(disconnected()),
-                             q, SLOT(hangup()));
-    Q_ASSERT(check);
+    connect(stream->d->connection, &QXmppIceConnection::localCandidatesChanged,
+                             q, &QXmppCall::localCandidatesChanged);
+    connect(stream->d->connection, &QXmppIceConnection::disconnected,
+                             q, &QXmppCall::hangup);
 
     Q_EMIT q->streamCreated(stream);
 
