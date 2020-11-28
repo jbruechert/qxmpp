@@ -244,9 +244,15 @@ if(WITH_GSTREAMER)
     )
 endif()
 
+if(WIN32)
+    set(QXMPP_LIB_DIR "${CMAKE_INSTALL_BINDIR}")
+else()
+    set(QXMPP_LIB_DIR "${CMAKE_INSTALL_LIBDIR}")
+endif()
+
 install(
     TARGETS qxmpp
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    DESTINATION "${QXMPP_LIB_DIR}"
     EXPORT QXmppTarget
 )
 
