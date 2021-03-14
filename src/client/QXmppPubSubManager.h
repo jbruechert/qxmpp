@@ -32,11 +32,12 @@
 #include <QFuture>
 #include <QFutureWatcher>
 
-//class QXmppPubSubManagerPrivate;
 class QXmppPubSubPublishOptions;
 
-class QXMPP_EXPORT QXmppPubSubEventManager
+class QXMPP_EXPORT QXmppPubSubEventManager : public QXmppClientExtension
 {
+    Q_OBJECT
+
 public:
     virtual bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) = 0;
 };
@@ -49,7 +50,7 @@ public:
     using Result = std::variant<std::monostate, QXmppStanza::Error, QXmpp::PacketState>;
     using InstantNodeResult = std::variant<QString, QXmppStanza::Error, QXmpp::PacketState>;
     using PublishItemResult = std::variant<QString, QXmppStanza::Error, QXmpp::PacketState>;
-    using PublishItemsResult = std::variant<QStringList, QXmppStanza::Error, QXmpp::PacketState>;
+    using PublishItemsResult = std::variant<QVector<QString>, QXmppStanza::Error, QXmpp::PacketState>;
     template<typename T>
     using ItemResult = std::variant<std::optional<T>, QXmppStanza::Error, QXmpp::PacketState>;
     template<typename T>
@@ -95,14 +96,16 @@ public:
 
     /// \cond
     bool handleStanza(const QDomElement &element) override;
-    /// \endcond
 
 private:
+    QFuture<Result> sendGenericIq(const QXmppIq &iq);
     QFuture<PublishItemResult> publishItem(QXmppPubSubIqBase &&iq);
     QFuture<PublishItemsResult> publishItems(QXmppPubSubIqBase &&iq);
     static QXmppPubSubIq<> requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds);
+    /// \endcond
 
-//    QScopedPointer<QXmppPubSubManagerPrivate> d;
+    // We may need a d-ptr in the future.
+    void *d;
 };
 
 template<typename T>
@@ -185,7 +188,6 @@ auto QXmppPubSubManager::requestItem(const QString &jid,
                 } else {
                     resultInterface.reportResult(resultIq.items().at(0));
                 }
-                resultInterface.reportFinished();
             } else {
                 QXmppIq iq;
                 iq.parse(*element);
@@ -193,8 +195,8 @@ auto QXmppPubSubManager::requestItem(const QString &jid,
             }
         } else if (const auto *error = std::get_if<QXmpp::PacketState>(&result)) {
             resultInterface.reportResult(*error);
-            resultInterface.reportFinished();
         }
+        resultInterface.reportFinished();
         watcher->deleteLater();
     });
     watcher->setFuture(sendFuture);
