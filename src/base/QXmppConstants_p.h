@@ -88,6 +88,9 @@ extern const char* ns_register_feature;
 // XEP-0078: Non-SASL Authentication
 extern const char* ns_auth;
 extern const char* ns_authFeature;
+// XEP-0084: User Avatar
+extern const char* ns_avatar_metadata;
+extern const char* ns_avatar_data;
 // XEP-0085: Chat State Notifications
 extern const char* ns_chat_states;
 // XEP-0091: Legacy Delayed Delivery
