@@ -56,92 +56,94 @@
 /// \code
 /// QStringList YourExtension::discoveryFeatures() const
 /// {
-///    return QStringList() << "http://jabber.org/protocol/tune+notify";
+///    return { "http://jabber.org/protocol/tune+notify" };
 /// }
 /// \endcode
+///
+/// \todo
+///  - Item pagination:
+///    https://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnsome
+///  - Requesting most recent items (max_items=2):
+///    https://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-requestrecent
 ///
 /// \ingroup Managers
 ///
 /// \since QXmpp 1.4
 ///
 
+///
+/// \typedef QXmppPubSubManager::Success
+///
+/// Type used to indicate the success case in an std::variant based return
+/// value.
+///
+
+///
+/// \typedef QXmppPubSubManager::Result
+///
+/// Result of a generic request without a return value. Contains Success in case
+/// everything went well. If the returned IQ contained an error a
+/// QXmppStanza::Error is reported. If sending the IQ was unsuccessful
+/// QXmpp::PacketState is reported.
+///
+
+///
+/// \typedef QXmppPubSubManager::InstantNodeResult
+///
+/// Contains the name of the new node (QString) or the returned IQ error
+/// (QXmppStanza::Error) or a packet sending error (QXmpp::PacketState).
+///
+
+///
+/// \typedef QXmppPubSubManager::ItemResult
+///
+/// Contains the item if it has been found (std::optional<T>) or the returned IQ
+/// error (QXmppStanza::Error) or a packet sending error (QXmpp::PacketState).
+///
+
+///
+/// \typedef QXmppPubSubManager::ItemsResult
+///
+/// Contains all items that have been found (QList<T>) or the returned IQ error
+/// (QXmppStanza::Error) or a packet sending error (QXmpp::PacketState).
+///
+
+///
+/// \typedef QXmppPubSubManager::PublishItemResult
+///
+/// Contains the ID of the item, if no ID was set in the request (QString) or
+/// the returned IQ error (QXmppStanza::Error) or a packet sending error
+/// (QXmpp::PacketState).
+///
+
+///
+/// \typedef QXmppPubSubManager::PublishItemsResult
+///
+/// Contains the IDs of the items, if no IDs were set in the request
+/// (QVector<QString>) or the returned IQ error (QXmppStanza::Error) or a packet
+/// sending error (QXmpp::PacketState).
+///
+
+///
+/// Default constructor.
+///
 QXmppPubSubManager::QXmppPubSubManager()
 {
 }
 
+///
+/// Default destructor.
+///
 QXmppPubSubManager::~QXmppPubSubManager()
 {
 }
 
 ///
-/// Creates an empty PEP node with the default configuration.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#createNode on the current account's bare JID.
-///
-/// Calling this before \ref QXmppPubSubManager#publishPepItems is usually not
-/// necessary when publishing to a node for the first time if the service
-/// suppports the auto-create feature (Section 7.1.4 of XEP-0060).
-///
-/// \param nodeName the name of the PEP node to be created
-/// \return
-///
-QFuture<QXmppPubSubManager::Result> QXmppPubSubManager::createPepNode(const QString &nodeName)
-{
-    return createNode(client()->configuration().jidBare(), nodeName);
-}
-
-///
-/// Deletes a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#deleteNode on the current account's bare JID.
-///
-/// \param nodeName the name of the PEP node to delete along with all of its
-/// items
-/// \return
-///
-auto QXmppPubSubManager::deletePepNode(const QString &nodeName) -> QFuture<Result>
-{
-    return deleteNode(client()->configuration().jidBare(), nodeName);
-}
-
-///
-/// Deletes an item from a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// QXmppPubSubManager::retractItem on the current account's bare JID.
-///
-/// \param nodeName the name of the PEP node to delete the item from
-/// \param itemId the ID of the item to delete
-/// \return
-///
-auto QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId) -> QFuture<Result>
-{
-    return retractItem(client()->configuration().jidBare(), nodeName, itemId);
-}
-
-///
-/// Purges all items from a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// QXmppPubSubManager::purgeItems on the current account's bare JID.
-///
-/// \param nodeName the name of the PEP node to delete along with all of its
-/// items
-/// \return
-///
-auto QXmppPubSubManager::purgePepItems(const QString &nodeName) -> QFuture<Result>
-{
-    return purgeItems(client()->configuration().jidBare(), nodeName);
-}
-
-///
 /// Creates an empty pubsub node with the default configuration.
 ///
-/// Calling this before \ref QXmppPubSubManager#publishItems is usually not
+/// Calling this before QXmppPubSubManager::publishItems is usually not
 /// necessary when publishing to a node for the first time if the service
-/// suppports the auto-create feature (Section 7.1.4 of XEP-0060).
+/// suppports the auto-create feature (Section 7.1.4 of \xep{0060}).
 ///
 /// \param jid Jabber ID of the entity hosting the pubsub service
 /// \param nodeName the name of the node to be created
@@ -156,6 +158,53 @@ auto QXmppPubSubManager::createNode(const QString &jid, const QString &nodeName)
     request.setTo(jid);
 
     return sendGenericIq(request);
+}
+
+///
+/// Creates an instant pubsub node with the default configuration.
+///
+/// The pubsub service automatically generates a random node name. On success
+/// it is returned via the QFuture.
+///
+/// \param jid Jabber ID of the entity hosting the pubsub service
+/// \param nodeName the name of the node to be created
+/// \return
+///
+QFuture<QXmppPubSubManager::InstantNodeResult> QXmppPubSubManager::createInstantNode(const QString &jid)
+{
+    QXmppPubSubIq request;
+    request.setType(QXmppIq::Set);
+    request.setQueryType(QXmppPubSubIq<>::Create);
+    request.setTo(jid);
+
+    auto resultInterface = QSharedPointer<QFutureInterface<InstantNodeResult>>(
+        new QFutureInterface<InstantNodeResult>(QFutureInterfaceBase::Started));
+    auto sendFuture = client()->sendIq(request);
+
+    auto *watcher = new QFutureWatcher<QXmppClient::IqResult>(this);
+    connect(watcher, &QFutureWatcherBase::finished, this, [=](){
+        auto result = watcher->result();
+        if (auto element = std::get_if<QDomElement>(&result)) {
+            QXmppPubSubIq iq;
+            iq.parse(*element);
+
+            switch (iq.type()) {
+            case QXmppIq::Result:
+                // report generated node name
+                resultInterface->reportResult(iq.queryNode());
+                break;
+            default:
+                resultInterface->reportResult(iq.error());
+            }
+        } else if (const auto *error = std::get_if<QXmpp::PacketState>(&result)) {
+            resultInterface->reportResult(*error);
+        }
+        resultInterface->reportFinished();
+        watcher->deleteLater();
+    });
+    watcher->setFuture(sendFuture);
+
+    return resultInterface->future();
 }
 
 ///
@@ -215,6 +264,69 @@ auto QXmppPubSubManager::purgeItems(const QString &jid, const QString &nodeName)
     return sendGenericIq(request);
 }
 
+///
+/// Creates an empty PEP node with the default configuration.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::createNode on the current account's bare JID.
+///
+/// Calling this before QXmppPubSubManager::publishPepItems is usually not
+/// necessary when publishing to a node for the first time if the service
+/// suppports the auto-create feature (Section 7.1.4 of XEP-0060).
+///
+/// \param nodeName the name of the PEP node to be created
+/// \return
+///
+auto QXmppPubSubManager::createPepNode(const QString &nodeName) -> QFuture<Result>
+{
+    return createNode(client()->configuration().jidBare(), nodeName);
+}
+
+///
+/// Deletes a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::deleteNode on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete along with all of its
+/// items
+/// \return
+///
+auto QXmppPubSubManager::deletePepNode(const QString &nodeName) -> QFuture<Result>
+{
+    return deleteNode(client()->configuration().jidBare(), nodeName);
+}
+
+///
+/// Deletes an item from a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::retractItem on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete the item from
+/// \param itemId the ID of the item to delete
+/// \return
+///
+auto QXmppPubSubManager::retractPepItem(const QString &nodeName, const QString &itemId) -> QFuture<Result>
+{
+    return retractItem(client()->configuration().jidBare(), nodeName, itemId);
+}
+
+///
+/// Purges all items from a PEP node.
+///
+/// This is a convenience method equivalent to calling
+/// QXmppPubSubManager::purgeItems on the current account's bare JID.
+///
+/// \param nodeName the name of the PEP node to delete along with all of its
+/// items
+/// \return
+///
+auto QXmppPubSubManager::purgePepItems(const QString &nodeName) -> QFuture<Result>
+{
+    return purgeItems(client()->configuration().jidBare(), nodeName);
+}
+
 /// \cond
 bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 {
@@ -249,7 +361,7 @@ auto QXmppPubSubManager::sendGenericIq(const QXmppIq &iq) -> QFuture<Result>
             QXmppIq iq;
             iq.parse(*element);
             if (iq.type() == QXmppIq::Result) {
-                resultInterface->reportResult(std::monostate());
+                resultInterface->reportResult(Success());
             } else {
                 resultInterface->reportResult(iq.error());
             }
@@ -263,26 +375,6 @@ auto QXmppPubSubManager::sendGenericIq(const QXmppIq &iq) -> QFuture<Result>
 
     return resultInterface->future();
 }
-/// \endcond
-
-///
-/// \fn QXmppPubSubManager::requestItems
-///
-/// Requests items of an entity's node.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service. For PEP this
-/// should be an account's bare JID
-/// \param nodeName the name of the node to query
-/// \param itemIds the ID's of the items to retrieve. If empty, retrieves all
-/// the items
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-
-///
-/// \overload QString QXmppPubSubManager::requestItems(const QString &jid, const QString &nodeName)
-///
-/// This requests all items.
-///
 
 QXmppPubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QString &nodeName, const QStringList &itemIds)
 {
@@ -303,17 +395,6 @@ QXmppPubSubIq<> QXmppPubSubManager::requestItemsIq(const QString &jid, const QSt
     return request;
 }
 
-///
-/// Publishs one item to a pubsub node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItem with no publish options.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the item to
-/// \param item the item to publish
-/// \return
-///
 auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<PublishItemResult>
 {
     request.setType(QXmppIq::Set);
@@ -352,16 +433,6 @@ auto QXmppPubSubManager::publishItem(QXmppPubSubIqBase &&request) -> QFuture<Pub
     return resultInterface->future();
 }
 
-///
-/// Publishs items to a pubsub node.
-///
-/// \param jid Jabber ID of the entity hosting the pubsub service
-/// \param nodeName the name of the node to publish the items to
-/// \param items the items to publish
-/// \param publishOptions publish-options for the items (optional). Pass an
-/// empty form to honor the default options of the node
-/// \return
-///
 auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<PublishItemsResult>
 {
     request.setType(QXmppIq::Set);
@@ -404,69 +475,4 @@ auto QXmppPubSubManager::publishItems(QXmppPubSubIqBase &&request) -> QFuture<Pu
 
     return resultInterface->future();
 }
-
-/*
-///
-/// Publishs one item to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItem with no publish options.
-///
-/// \param nodeName the name of the PEP node to publish the item to
-/// \param item the item to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItem(const QString &nodeName, const QXmppPubSubItem &item)
-{
-    return publishPepItem(nodeName, item, QXmppDataForm());
-}
-
-///
-/// Publishs one item to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItems with a single item in the items list.
-///
-/// \param nodeName the name of the PEP node to publish the item to
-/// \param item the item to publish
-/// \param publishOptions publish-options for fine tuning (optional). Pass
-/// an empty form to honor the default options of the PEP node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItem(const QString &nodeName, const QXmppPubSubItem &item, const QXmppDataForm &publishOptions)
-{
-    return publishPepItems(nodeName, QList<QXmppPubSubItem>({item}), publishOptions);
-}
-
-///
-/// Publishs items to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishPepItems with no publish options.
-///
-/// \param nodeName the name of the PEP node to publish the items to
-/// \param items the items to publish
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items)
-{
-    return publishPepItems(nodeName, items, QXmppDataForm());
-}
-
-///
-/// Publishs items to a PEP node.
-///
-/// This is a convenience method equivalent to calling
-/// \ref QXmppPubSubManager#publishItems on the current account's bare JID.
-///
-/// \param nodeName the name  of the PEP node to publish the items to
-/// \param items the items to publish
-/// \param publishOptions publish-options for fine tuning (optional). Pass
-/// an empty form to honor the default options of the PEP node
-/// \return the ID of the resulting IQ stanza if sent. Empty string otherwise
-///
-QString QXmppPubSubManager::publishPepItems(const QString &nodeName, const QList<QXmppPubSubItem> &items, const QXmppDataForm &publishOptions)
-{
-    return publishItems(client()->configuration().jidBare(), nodeName, items, publishOptions);
-}
-*/
+/// \endcond
