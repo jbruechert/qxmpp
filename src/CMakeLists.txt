@@ -21,6 +21,7 @@ set(INSTALL_HEADER_FILES
     # Base
     base/QXmppArchiveIq.h
     base/QXmppAvatar.h
+    base/QXmppAvatarManager.h
     base/QXmppBindIq.h
     base/QXmppBitsOfBinaryContentId.h
     base/QXmppBitsOfBinaryData.h
@@ -116,6 +117,7 @@ set(SOURCE_FILES
     # Base
     base/QXmppArchiveIq.cpp
     base/QXmppAvatar.cpp
+    base/QXmppAvatarManager.cpp
     base/QXmppBindIq.cpp
     base/QXmppBitsOfBinaryContentId.cpp
     base/QXmppBitsOfBinaryData.cpp

@@ -2,7 +2,7 @@
  * Copyright (C) 2008-2021 The QXmpp developers
  *
  * Author:
- *  Manjeet Dahiya
+ *  Jonah Brüchert
  *
  * Source:
  *  https://github.com/qxmpp-project/qxmpp
