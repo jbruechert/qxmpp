@@ -189,7 +189,8 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
                                                                              const QString &nodeName,
                                                                              const QStringList &itemIds)
 {
-    QFutureInterface<ItemsResult<T>> resultInterface(QFutureInterfaceBase::Started);
+    auto resultInterface = QSharedPointer<QFutureInterface<ItemsResult<T>>>(
+        new QFutureInterface<ItemsResult<T>>);
 
     auto sendFuture = client()->sendIq(requestItemsIq(jid, nodeName, itemIds));
 
@@ -201,23 +202,22 @@ QFuture<QXmppPubSubManager::ItemsResult<T>> QXmppPubSubManager::requestItems(con
                 // FIXME: could this still be an IQ of type error?
                 QXmppPubSubIq<T> resultIq;
                 resultIq.parse(*element);
-                resultInterface.reportResult(resultIq.items());
-                resultInterface.reportFinished();
+                resultInterface->reportResult(resultIq.items());
             } else {
                 QXmppIq iq;
                 iq.parse(*element);
 
-                resultInterface.reportResult(iq.error());
+                resultInterface->reportResult(iq.error());
             }
         } else if (const auto *error = std::get_if<QXmpp::PacketState>(&result)) {
-            resultInterface.reportResult(*error);
-            resultInterface.reportFinished();
+            resultInterface->reportResult(*error);
         }
+        resultInterface->reportFinished();
         watcher->deleteLater();
     });
     watcher->setFuture(sendFuture);
 
-    return resultInterface.future();
+    return resultInterface->future();
 }
 
 ///
