@@ -23,12 +23,14 @@
 
 #include "QXmppAvatarManager.h"
 
-#include <QXmppConstants_p.h>
+#include "QXmppAvatar.h"
+#include "QXmppConstants_p.h"
+
+#include <QSharedPointer>
 
 QXmppAvatarManager::QXmppAvatarManager()
     : QXmppClientExtension()
 {
-
 }
 
 AvatarMetadataFuture QXmppAvatarManager::fetchAvatarMetadata(const QString &bareJid)

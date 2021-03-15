@@ -28,13 +28,16 @@
 
 #include <QXmppClientExtension.h>
 #include <QXmppPubSubManager.h>
-#include <QXmppAvatar.h>
+
+class QXmppAvatarMetadataItem;
+class QXmppAvatarDataItem;
 
 using AvatarMetadataFuture = QFuture<QXmppPubSubManager::ItemsResult<QXmppAvatarMetadataItem>>;
 using AvatarDataFuture = QFuture<QXmppPubSubManager::ItemsResult<QXmppAvatarDataItem>>;
 
 class QXmppAvatarManager : public QXmppClientExtension
 {
+    Q_OBJECT
 
 public:
     explicit QXmppAvatarManager();
