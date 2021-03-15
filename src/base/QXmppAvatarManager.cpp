@@ -23,24 +23,60 @@
 
 #include "QXmppAvatarManager.h"
 
-#include "QXmppAvatar.h"
 #include "QXmppConstants_p.h"
 
 #include <QSharedPointer>
+#include <QCryptographicHash>
 
 QXmppAvatarManager::QXmppAvatarManager()
     : QXmppClientExtension()
 {
 }
 
-AvatarMetadataFuture QXmppAvatarManager::fetchAvatarMetadata(const QString &bareJid)
+QFuture<AvatarMetadata> QXmppAvatarManager::fetchAvatarMetadata(const QString &bareJid)
 {
-    auto *pubSubManager = client()->findExtension<QXmppPubSubManager>();
-    return pubSubManager->requestItems<QXmppAvatarMetadataItem>(bareJid, ns_avatar_metadata);
+    return client()->findExtension<QXmppPubSubManager>()
+            ->requestItems<QXmppAvatarMetadataItem>(bareJid, ns_avatar_metadata);
 }
 
-AvatarDataFuture QXmppAvatarManager::fetchAvatar(const QString &bareJid)
+QFuture<AvatarData> QXmppAvatarManager::fetchAvatar(const QString &bareJid, const QString &itemId)
 {
-    auto *pubSubManager = client()->findExtension<QXmppPubSubManager>();
-    return pubSubManager->requestItems<QXmppAvatarDataItem>(bareJid, ns_avatar_data);
+    return client()->findExtension<QXmppPubSubManager>()
+            ->requestItems<QXmppAvatarDataItem>(bareJid, ns_avatar_data, {itemId});
+}
+
+QFuture<QXmppPubSubManager::PublishItemResult> QXmppAvatarManager::publishAvatar(const QXmppAvatarInfo &avatarInfo, const QByteArray &avatarData)
+{
+    auto resultInterface = std::make_shared<QFutureInterface<QXmppPubSubManager::PublishItemResult>>(QFutureInterfaceBase::Started);
+
+    const auto hash = QCryptographicHash::hash(avatarData, QCryptographicHash::Sha1).toHex();
+
+    QXmppAvatarDataItem dataItem(avatarData);
+    dataItem.setId(hash);
+
+    const auto uploadFuture = client()->findExtension<QXmppPubSubManager>()
+            ->publishPepItem(ns_avatar_data, dataItem);
+
+    auto updatedAvatarInfo = avatarInfo;
+    updatedAvatarInfo.setId(hash);
+    QXmppAvatarMetadataItem meta;
+    meta.setInfos({avatarInfo});
+
+    auto *watcher = new QFutureWatcher<QXmppPubSubManager::PublishItemResult>(this);
+    connect(watcher, &QFutureWatcherBase::finished, this, [=]() {
+        const auto result = watcher->result();
+
+        const auto metaFuture = client()->findExtension<QXmppPubSubManager>()
+                ->publishPepItem(ns_avatar_metadata, meta);
+
+        auto *metaWatcher = new QFutureWatcher<QXmppPubSubManager::PublishItemResult>(this);
+        connect(metaWatcher, &QFutureWatcherBase::finished, this, [=]() {
+            resultInterface->reportFinished();
+        });
+        metaWatcher->setFuture(metaFuture);
+    });
+
+    watcher->setFuture(uploadFuture);
+
+    return resultInterface->future();
 }

@@ -43,6 +43,7 @@ public:
     QXmppAvatarInfo();
     ~QXmppAvatarInfo();
     QXmppAvatarInfo(const QXmppAvatarInfo &other);
+    QXmppAvatarInfo &operator=(const QXmppAvatarInfo &other);
 
     quint32 bytes() const;
     void setBytes(const quint32 value);
@@ -72,6 +73,7 @@ public:
     QXmppAvatarMetadataItem();
     ~QXmppAvatarMetadataItem();
     QXmppAvatarMetadataItem(const QXmppAvatarMetadataItem &other);
+    QXmppAvatarMetadataItem &operator=(const QXmppAvatarMetadataItem &other);
 
     QVector<QXmppAvatarInfo> infos() const;
     void setInfos(const QVector<QXmppAvatarInfo> &infos);
@@ -87,8 +89,10 @@ class QXmppAvatarDataItem : public QXmppPubSubItem
 {
 public:
     QXmppAvatarDataItem();
+    explicit QXmppAvatarDataItem(const QByteArray &avatarData);
     ~QXmppAvatarDataItem();
     QXmppAvatarDataItem(const QXmppAvatarDataItem &other);
+    QXmppAvatarDataItem &operator=(const QXmppAvatarDataItem &other);
 
     QByteArray data() const;
 

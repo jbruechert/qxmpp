@@ -58,8 +58,10 @@ QXmppAvatarMetadataItem::QXmppAvatarMetadataItem()
     : d(new QXmppAvatarMetadataItemPrivate())
 {
 }
+
 QXmppAvatarMetadataItem::~QXmppAvatarMetadataItem() = default;
 QXmppAvatarMetadataItem::QXmppAvatarMetadataItem(const QXmppAvatarMetadataItem &other) = default;
+QXmppAvatarMetadataItem &QXmppAvatarMetadataItem::operator=(const QXmppAvatarMetadataItem &other) = default;
 
 QVector<QXmppAvatarInfo> QXmppAvatarMetadataItem::infos() const
 {
@@ -134,6 +136,7 @@ QXmppAvatarInfo::QXmppAvatarInfo()
 
 QXmppAvatarInfo::QXmppAvatarInfo(const QXmppAvatarInfo &other) = default;
 QXmppAvatarInfo::~QXmppAvatarInfo() = default;
+QXmppAvatarInfo &QXmppAvatarInfo::operator=(const QXmppAvatarInfo &other) = default;
 
 quint32 QXmppAvatarInfo::bytes() const
 {
@@ -199,8 +202,16 @@ QXmppAvatarDataItem::QXmppAvatarDataItem()
     : d(new QXmppAvatarDataItemPrivate())
 {
 }
+
+QXmppAvatarDataItem::QXmppAvatarDataItem(const QByteArray &avatarData)
+    : d(new QXmppAvatarDataItemPrivate())
+{
+    d->data = avatarData;
+}
+
 QXmppAvatarDataItem::~QXmppAvatarDataItem() = default;
 QXmppAvatarDataItem::QXmppAvatarDataItem(const QXmppAvatarDataItem &other) = default;
+QXmppAvatarDataItem &QXmppAvatarDataItem::operator=(const QXmppAvatarDataItem &other) = default;
 
 QByteArray QXmppAvatarDataItem::data() const
 {
