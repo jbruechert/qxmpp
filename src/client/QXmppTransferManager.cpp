@@ -1342,8 +1342,8 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->state() != QXmppTransferJob::OfferState)
         return;
 
-    const auto &form = iq.featureForm();
-    const auto &fields = form.fields();
+    const auto form = iq.featureForm();
+    const auto fields = form.fields();
 
     for (const auto &field : fields) {
         if (field.key() == "stream-method") {
